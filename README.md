@@ -1,5 +1,9 @@
 # claude-code-team-builder
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://docs.anthropic.com/en/docs/claude-code)
+[![v1.0.0](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/azadmotala/claude-code-team-builder/releases/tag/v1.0.0)
+
 A Claude Code skill that generates a complete, self-healing AI development team for any software project.
 
 Describe what you're building. It creates an orchestrator, specialist agents, routing rules, execution skills, and a project brain — a full `.claude/` directory that Claude Code reads at every session start. The orchestrator plans the work, assigns tasks to the right agent, validates results, and self-heals when things fail. You review the plan, then let it run.
@@ -39,7 +43,7 @@ Most multi-agent setups require external infrastructure, cloud APIs, or Python f
 ### 1. Install the skill
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/claude-code-team-builder.git
+git clone https://github.com/azadmotala/claude-code-team-builder.git
 
 mkdir -p ~/.claude/skills/claude-code-team-builder
 cp -r claude-code-team-builder/skill/* ~/.claude/skills/claude-code-team-builder/

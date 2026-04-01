@@ -3,7 +3,7 @@ name: claude-code-team-builder
 description: "Builds a complete AI development environment for a software project — agents, custom skills, CLAUDE.md project context, orchestration layer, and routing rules. Triggers when someone says 'set up a new project', 'build a team for [project]', 'create project setup', 'scaffold my AI team', or describes a client project and wants Claude Code configured for it. Produces a full .claude/ configuration with project context, agent routing, autonomous execution support, and slash commands tailored to the project's domain and workflow."
 ---
 
-# Software Project Team Builder
+# Claude Code Team Builder
 
 ## What This Skill Produces
 

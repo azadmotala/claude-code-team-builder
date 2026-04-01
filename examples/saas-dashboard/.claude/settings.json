@@ -1,0 +1,22 @@
+{
+  "autonomy": {
+    "mode": "supervised",
+    "auto_advance_milestones": true,
+    "escalation_enabled": true
+  },
+  "retry_policy": {
+    "max_retries": 4,
+    "strategy": "classify-then-act",
+    "simple_failure_retry": 1
+  },
+  "self_healing": {
+    "enabled": true,
+    "pipeline": ["simple-retry", "refine-instructions", "split-task", "reassign-agent", "escalate"],
+    "invoke_problem_solver": "structural-failures-only"
+  },
+  "model_tiers": {
+    "planning": "sonnet",
+    "execution": "sonnet",
+    "validation": "sonnet"
+  }
+}

@@ -1,7 +1,5 @@
 <img width="830" height="300" alt="claude-code-team-builder" src="https://github.com/user-attachments/assets/e0fb3bda-476e-438c-98c3-53f40f0bda67" />
 
-# claude-code-team-builder
-
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://docs.anthropic.com/en/docs/claude-code)
 [![v1.0.0](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/azadmotala/claude-code-team-builder/releases/tag/v1.0.0)

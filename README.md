@@ -1,4 +1,4 @@
-<img width="830" height="300" alt="claude-code-team-builder" src="https://github.com/user-attachments/assets/2d90ba94-7729-4dce-9a30-6c47b1ec5628" />
+<img width="830" height="300" alt="claude-code-team-builder" src="https://github.com/user-attachments/assets/e0fb3bda-476e-438c-98c3-53f40f0bda67" />
 
 # claude-code-team-builder
 

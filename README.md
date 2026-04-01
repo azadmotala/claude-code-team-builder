@@ -39,7 +39,7 @@ Most multi-agent setups require external infrastructure, cloud APIs, or Python f
 ### 1. Install the skill
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/claude-code-team-builder.git
+git clone https://github.com/azadmotala/claude-code-team-builder.git
 
 mkdir -p ~/.claude/skills/claude-code-team-builder
 cp -r claude-code-team-builder/skill/* ~/.claude/skills/claude-code-team-builder/
@@ -106,40 +106,40 @@ your-project/
 
 ### Mandatory Agents (every project)
 
-| Agent | Role |
-|---|---|
-| `orchestrator` | Plans tasks, assigns agents, validates results, drives execution |
-| `problem-solver` | Diagnoses failures, rewrites tasks, splits complex work, suggests reassignment |
-| `test-engineer` | Validates every feature against acceptance criteria |
-| `documentation-writer` | PRDs before development, specs for handoff |
+| Agent                  | Role                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| `orchestrator`         | Plans tasks, assigns agents, validates results, drives execution               |
+| `problem-solver`       | Diagnoses failures, rewrites tasks, splits complex work, suggests reassignment |
+| `test-engineer`        | Validates every feature against acceptance criteria                            |
+| `documentation-writer` | PRDs before development, specs for handoff                                     |
 
 ### Additional Agents (added by stack)
 
-| Signal | Agent |
-|---|---|
-| Full-stack framework (Next.js, Nuxt, SvelteKit) | `fullstack-developer` |
-| Separate frontend and backend | `frontend-developer` + `backend-developer` |
-| Complex database / schema-heavy | `database-architect` |
-| Deployment / CI/CD | `devops-engineer` |
-| Client project / sensitive logic | `code-reviewer` |
-| Payments / billing | `payments-engineer` |
-| Real-time / WebSockets | `streaming-engineer` |
-| Auth / OAuth / compliance | `auth-security-engineer` |
-| ML / AI features | `ml-engineer` |
-| Mobile (iOS / Android / React Native) | `mobile-developer` |
+| Signal                                          | Agent                                      |
+| ----------------------------------------------- | ------------------------------------------ |
+| Full-stack framework (Next.js, Nuxt, SvelteKit) | `fullstack-developer`                      |
+| Separate frontend and backend                   | `frontend-developer` + `backend-developer` |
+| Complex database / schema-heavy                 | `database-architect`                       |
+| Deployment / CI/CD                              | `devops-engineer`                          |
+| Client project / sensitive logic                | `code-reviewer`                            |
+| Payments / billing                              | `payments-engineer`                        |
+| Real-time / WebSockets                          | `streaming-engineer`                       |
+| Auth / OAuth / compliance                       | `auth-security-engineer`                   |
+| ML / AI features                                | `ml-engineer`                              |
+| Mobile (iOS / Android / React Native)           | `mobile-developer`                         |
 
 ### Skills
 
-| Skill | Always | Purpose |
-|---|---|---|
-| `/run` | Yes | Autonomous execution loop with state reconciliation |
-| `/status` | Yes | Project state: done, in progress, blocked, failed, next |
-| `/dashboard` | Yes | Generate visual HTML progress tracker |
-| `/deploy` | When hosting target exists | Build, test gate, deploy to staging/production |
-| `/test` | When tests exist | Run unit + integration + e2e suite |
-| `/review` | Client projects | Security, correctness, quality review |
-| `/migrate` | Relational database | Run ORM migrations |
-| Domain skills | Derived from project | `/process-refund`, `/onboard-tenant`, etc. |
+| Skill         | Always                     | Purpose                                                 |
+| ------------- | -------------------------- | ------------------------------------------------------- |
+| `/run`        | Yes                        | Autonomous execution loop with state reconciliation     |
+| `/status`     | Yes                        | Project state: done, in progress, blocked, failed, next |
+| `/dashboard`  | Yes                        | Generate visual HTML progress tracker                   |
+| `/deploy`     | When hosting target exists | Build, test gate, deploy to staging/production          |
+| `/test`       | When tests exist           | Run unit + integration + e2e suite                      |
+| `/review`     | Client projects            | Security, correctness, quality review                   |
+| `/migrate`    | Relational database        | Run ORM migrations                                      |
+| Domain skills | Derived from project       | `/process-refund`, `/onboard-tenant`, etc.              |
 
 ---
 
@@ -184,21 +184,21 @@ See [`examples/saas-dashboard/`](examples/saas-dashboard/) for a complete genera
 
 Set in `settings.json`:
 
-| Mode | Behavior |
-|---|---|
-| `supervised` | Pauses at milestone boundaries for review. Escalates on failure after self-healing. Default. |
-| `autonomous` | Auto-advances milestones when criteria pass. Escalates only on catastrophic failure. |
-| `strict-autonomous` | No escalation. Problem-solver handles everything. Failed tasks skipped after max retries. |
+| Mode                | Behavior                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `supervised`        | Pauses at milestone boundaries for review. Escalates on failure after self-healing. Default. |
+| `autonomous`        | Auto-advances milestones when criteria pass. Escalates only on catastrophic failure.         |
+| `strict-autonomous` | No escalation. Problem-solver handles everything. Failed tasks skipped after max retries.    |
 
 ### Model Tiers
 
 Not every agent needs the same model:
 
-| Tier | Agents | Default | Cost-optimized | Quality-maximized |
-|---|---|---|---|---|
-| Planning | orchestrator, problem-solver | sonnet | sonnet | opus |
-| Execution | developer agents, devops | sonnet | sonnet | sonnet |
-| Validation | test-engineer, code-reviewer, docs | sonnet | haiku | sonnet |
+| Tier       | Agents                             | Default | Cost-optimized | Quality-maximized |
+| ---------- | ---------------------------------- | ------- | -------------- | ----------------- |
+| Planning   | orchestrator, problem-solver       | sonnet  | sonnet         | opus              |
+| Execution  | developer agents, devops           | sonnet  | sonnet         | sonnet            |
+| Validation | test-engineer, code-reviewer, docs | sonnet  | haiku          | sonnet            |
 
 ---
 

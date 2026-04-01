@@ -1,4 +1,4 @@
-# Software Project Team Builder — User Guide
+# Claude Code Team Builder — User Guide
 
 ## What It Does
 

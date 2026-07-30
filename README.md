@@ -7,7 +7,7 @@
 
 A Claude Code skill that generates a complete, self-healing AI development team for any software project.
 
-Describe what you're building. It creates an orchestrator, specialist agents, routing rules, execution skills, and a project brain — a full `.claude/` directory that Claude Code reads at every session start. The orchestrator plans the work, assigns tasks to the right agent, validates results, and self-heals when things fail. You review the plan, then let it run.
+Describe what you're building. It creates an orchestrator, specialist agents, routing rules, execution skills, and a project brain — a full `.claude/` directory that Claude Code reads at every session start. The orchestrator plans the work, assigns tasks to the right agent, validates results, and self-heals when things fail. You review the plan, then let it run
 
 ---
 

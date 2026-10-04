@@ -62,12 +62,12 @@ Read retry policy from `settings.json`. Classify the failure first:
 1. **Refine** (attempts 1–2): problem-solver rewrites the task
 2. **Split** (attempt 3): problem-solver decomposes into subtasks
 3. **Reassign** (attempt 4): try a different qualified agent
-4. **Escalate or skip**: based on `settings.json` autonomy mode
+4. **Escalate or skip**: in `supervised` or `autonomous` mode, pause and ask the human; in `strict-autonomous` mode, mark the task `skipped` and move on
 
 ### 6. Milestone boundary
 - When all tasks in a milestone are `done`:
-  - If `auto_advance_milestones` is true → validate milestone outputs and advance
-  - If false → pause and ask for human review
+  - If `mode` is `supervised` → pause and ask for human review
+  - Otherwise → validate milestone outputs and advance
 
 ### 7. Completion check
 - After each milestone, check project completion criteria from CLAUDE.md

@@ -182,7 +182,7 @@ There are three, set with `autonomy.mode` in `settings.json`:
 | Mode | Behavior |
 |---|---|
 | `supervised` | The default. Stops at each milestone for your review, and comes to you when self-healing can't fix a failure. |
-| `autonomous` | Moves to the next milestone on its own when the acceptance criteria pass. Only stops for a catastrophic failure. |
+| `autonomous` | Moves to the next milestone on its own when the acceptance criteria pass. Only stops when a task still fails after self-healing. |
 | `strict-autonomous` | Never stops to ask. The problem-solver handles everything, and a task that still fails after max retries gets skipped. |
 
 Start with `supervised`. Move to `autonomous` once you trust its plans. Use `strict-autonomous` for batch runs you'll review afterwards.

@@ -39,7 +39,7 @@ For any software project, this skill generates a complete `.claude/` directory:
 - *Workflow skills* — `/deploy`, `/test`, `/review`, `/migrate` — developer workflows
 - *Domain skills* — tailored to what this project does (e.g., `/process-refund`, `/onboard-vendor`)
 
-**settings.json** controls orchestration behavior: autonomy mode, milestone auto-advance, retry policy, and the self-healing pipeline.
+**settings.json** controls orchestration behavior: autonomy mode, retry policy, and the self-healing pipeline.
 
 **This skill does NOT create:**
 - PRDs, architecture documents, or specs (the documentation-writer agent does that)
@@ -217,9 +217,7 @@ Keep CLAUDE.md under 130 lines. Dense but scannable.
 ```json
 {
   "autonomy": {
-    "mode": "supervised",
-    "auto_advance_milestones": true,
-    "escalation_enabled": true
+    "mode": "supervised"
   },
   "retry_policy": {
     "max_retries": 4,
@@ -239,10 +237,10 @@ Keep CLAUDE.md under 130 lines. Dense but scannable.
 }
 ```
 
-The `mode` field accepts three values:
-- `"supervised"` — pauses for human input at milestone boundaries and on escalation (default)
-- `"autonomous"` — auto-advances milestones when acceptance criteria pass, only escalates on catastrophic failure
-- `"strict-autonomous"` — escalation disabled entirely; the problem-solver handles everything
+The `mode` field is the only switch for milestone pauses and escalation. It accepts three values:
+- `"supervised"` — pauses for human review at every milestone boundary, and stops to ask when a task still fails after self-healing (default)
+- `"autonomous"` — advances milestones on its own when acceptance criteria pass, and stops to ask only when a task still fails after self-healing
+- `"strict-autonomous"` — never stops to ask; a task that still fails after self-healing is marked `skipped`
 
 The `model_tiers` field controls which model each agent class uses:
 - `"planning"` — orchestrator, problem-solver (options: `"opus"`, `"sonnet"`)

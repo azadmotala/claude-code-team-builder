@@ -198,7 +198,7 @@ Set `autonomy.mode` in `settings.json`:
 | Mode | Behavior |
 |---|---|
 | `supervised` | The default. Stops at each milestone so you can review, and comes to you when self-healing can't fix a failure. |
-| `autonomous` | Moves to the next milestone on its own when the criteria pass. Only stops for a catastrophic failure. |
+| `autonomous` | Moves to the next milestone on its own when the criteria pass. Only stops when a task still fails after self-healing. |
 | `strict-autonomous` | Never stops to ask. The problem-solver handles everything, and a task that still fails after max retries gets skipped. |
 
 ### Model Tiers

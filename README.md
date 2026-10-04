@@ -5,37 +5,37 @@
 [![v1.0.0](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/azadmotala/claude-code-team-builder/releases/tag/v1.0.0)
 
 
-A Claude Code skill that generates a complete, self-healing AI development team for any software project.
+A Claude Code skill that builds a self-healing AI development team for your software project.
 
-Describe what you're building. It creates an orchestrator, specialist agents, routing rules, execution skills, and a project brain — a full `.claude/` directory that Claude Code reads at every session start. The orchestrator plans the work, assigns tasks to the right agent, validates results, and self-heals when things fail. You review the plan, then let it run.
+Tell it what you're building and it writes a full `.claude/` directory: an orchestrator, specialist agents, routing rules, execution skills, and a CLAUDE.md that Claude Code reads at the start of every session. The orchestrator plans the work, hands each task to the right agent, and checks what comes back. When something fails, it works out why and tries a different approach before it comes to you. You review the plan, then let it run.
 
 ---
 
 ## Why This Exists
 
-Most multi-agent setups require external infrastructure, cloud APIs, or Python frameworks. This one is different:
+Most multi-agent setups need something running outside your editor: cloud APIs, external services, a Python framework. This one is a folder of files.
 
-- **Repo-local.** Everything lives in `.claude/` — plain markdown files. No external services, no databases, no cloud dependencies.
-- **Claude Code-native.** Built for Claude Code's agent and skill system. Not a generic framework adapted to fit.
-- **Self-healing.** Failed tasks get classified, retried, rewritten, or split automatically before asking you for help.
-- **Deterministic.** Tasks have explicit acceptance criteria. The orchestrator validates every result. Nothing advances on vibes.
-- **Persistent.** State reconciliation across sessions means interrupted work picks up where it left off.
+- **Lives in your repo.** Everything sits in `.claude/` as plain markdown. No services to run, no database, nothing extra to host.
+- **Built for Claude Code.** It's built from Claude Code's own agents, skills, and CLAUDE.md.
+- **Fixes its own failures.** A failed task gets classified, then retried, rewritten, split, or handed to another agent. You only hear about it if none of that works.
+- **Nothing advances on vibes.** Every task has explicit acceptance criteria, and the orchestrator checks the result against them before anything moves forward.
+- **Picks up where it left off.** Close a session halfway through and the next one works out where things stood, then carries on.
 
 ---
 
 ## Key Features
 
-**Orchestrator + Problem-Solver architecture.** The orchestrator plans, assigns, and validates. When tasks fail, the problem-solver diagnoses the issue and rewrites, splits, or reassigns the task — up to 4 attempts before escalating.
+**An orchestrator and a problem-solver.** The orchestrator plans, assigns, and checks. When a task fails, the problem-solver works out what went wrong and rewrites the task, splits it, or hands it to another agent. It gets up to 4 attempts before it escalates.
 
-**Three autonomy modes.** `supervised` pauses at milestones for your review. `autonomous` auto-advances when criteria pass. `strict-autonomous` handles everything without interruption.
+**Three autonomy modes.** `supervised` stops at each milestone so you can review. `autonomous` moves on by itself when the criteria pass. `strict-autonomous` never stops to ask.
 
-**State reconciliation.** Every session starts by syncing `tasks.json`, workspace result files, and `orchestrator_state.json`. Interrupted sessions, manual edits, and crashed processes get corrected automatically.
+**State that survives a crash.** Every session starts by syncing `tasks.json`, the workspace result files, and `orchestrator_state.json`. Interrupted sessions, manual edits, and crashed processes all get straightened out before any new work starts.
 
-**Token optimization.** State summarization keeps context growth linear. Tiered model assignment lets you run planning on Opus and validation on Haiku. Right-sized task decomposition prevents over-decomposition — fewer tasks means fewer token-expensive handoffs.
+**Easy on tokens.** The orchestrator carries a one-line summary of each finished task and leaves the full results on disk, so context grows with the number of tasks. You can run planning on Opus and validation on Haiku. Its task sizing rules stop it splitting work too finely, so there are fewer agent handoffs to pay for.
 
-**Visual dashboard.** A self-contained HTML file that reads task state from disk and auto-refreshes every 5 seconds. Milestone progress, task status, activity timeline — all in the browser.
+**A dashboard you can leave open.** One self-contained HTML file that reads task state from disk and refreshes every 5 seconds. Milestone progress, task status, and an activity timeline, all in your browser.
 
-**Project-specific everything.** Every agent description names your actual technologies. Every skill references your actual commands. Every routing rule maps to your actual domain. No generic placeholders survive generation.
+**Nothing generic.** Agent descriptions name your stack, skills call your real commands, and routing follows your domain. If you're on Prisma and Stripe, the files say Prisma and Stripe.
 
 ---
 
@@ -52,7 +52,7 @@ cp -r claude-code-team-builder/skill/* ~/.claude/skills/claude-code-team-builder
 
 ### 2. Run it
 
-In Claude Code, say:
+In Claude Code, say something like:
 
 ```
 Set up a new project
@@ -66,21 +66,21 @@ Build a team for my Next.js marketplace app
 
 ### 3. Answer the questions
 
-Choose **paste mode** (dump everything at once) or **Q&A mode** (guided questions). Three things are required:
+It'll ask how you want to do this: **paste mode** (dump everything you know in one go) or **Q&A mode** (it asks, you answer). Either way, it needs three things:
 
-1. What you're building (type + purpose)
+1. What you're building, and what it's for
 2. Your tech stack (frontend, backend, database)
-3. The hard parts (payments, auth, real-time, compliance)
+3. The hard parts: payments, auth, real-time, compliance, whatever's riskiest
 
-Everything else gets inferred with reasonable defaults.
+It fills in the rest with sensible defaults.
 
-### 4. Plan and execute
+### 4. Plan, then run
 
 ```
-/run --plan          # Review the task decomposition first
-/run                 # Start autonomous execution
-/status              # Check progress any time
-/dashboard           # Generate the visual tracker
+/run --plan          # see the plan first; nothing runs yet
+/run                 # start working through it
+/status              # check progress any time
+/dashboard           # set up the visual tracker
 ```
 
 ---
@@ -129,6 +129,7 @@ your-project/
 | Client project / sensitive logic | `code-reviewer` |
 | Payments / billing | `payments-engineer` |
 | Real-time / WebSockets | `streaming-engineer` |
+| Existing client design system | `design-system-integrator` |
 | Auth / OAuth / compliance | `auth-security-engineer` |
 | ML / AI features | `ml-engineer` |
 | Mobile (iOS / Android / React Native) | `mobile-developer` |
@@ -144,21 +145,26 @@ your-project/
 | `/test` | When tests exist | Run unit + integration + e2e suite |
 | `/review` | Client projects | Security, correctness, quality review |
 | `/migrate` | Relational database | Run ORM migrations |
+| `/pr` | GitHub/GitLab pull requests | Pull request workflow |
+| `/seed` | Dev seed data exists | Seed the development database |
+| `/changelog` | Client expects release notes | Release notes for versioned deliverables |
 | Domain skills | Derived from project | `/process-refund`, `/onboard-tenant`, etc. |
 
 ---
 
 ## How It Works
 
-The skill runs through five phases:
+The skill works through five phases:
 
-1. **Discovery** — collects project details via paste mode or guided Q&A
-2. **Agent selection** — picks mandatory + specialist agents based on stack and complexity
-3. **Skill selection** — adds execution, workflow, and domain skills
-4. **File generation** — creates all `.claude/` files with project-specific content, copying structural sections (state management, self-healing pipeline, task sizing rules) verbatim from templates
-5. **Validation** — verifies mandatory agents exist, structural sections are complete, descriptions reference the actual stack, and settings.json has autonomy + self-healing configuration
+1. **Discovery**: finds out what you're building, from your paste or through Q&A
+2. **Agent selection**: picks the four mandatory agents, plus specialists that fit your stack and how complex the project is
+3. **Skill selection**: adds execution, workflow, and domain skills
+4. **File generation**: writes every file in `.claude/` for your project. The sections that control behavior (state management, the self-healing pipeline, task sizing rules) are copied word for word from the templates, because the agents need the edge cases a summary would drop.
+5. **Validation**: checks its own output. The mandatory agents are there, the copied sections are complete, every description mentions your real stack, and `settings.json` has the autonomy and self-healing config.
 
 ### The Execution Loop
+
+Once you've approved the plan, `/run` goes round this loop until the project is done or something needs you:
 
 ```
 /run --plan → Review → /run → Orchestrator loops:
@@ -179,7 +185,7 @@ The skill runs through five phases:
 
 ## Example Output
 
-See [`examples/saas-dashboard/`](examples/saas-dashboard/) for a complete generated output — a multi-tenant SaaS dashboard built with Next.js, Prisma, PostgreSQL, Clerk auth, and Stripe billing.
+[`examples/saas-dashboard/`](examples/saas-dashboard/) is a complete example of what the builder generates, for a multi-tenant SaaS dashboard on Next.js, Prisma, PostgreSQL, Clerk auth, and Stripe billing. Have a look before you run it on your own project.
 
 ---
 
@@ -187,17 +193,17 @@ See [`examples/saas-dashboard/`](examples/saas-dashboard/) for a complete genera
 
 ### Autonomy Modes
 
-Set in `settings.json`:
+Set `autonomy.mode` in `settings.json`:
 
 | Mode | Behavior |
 |---|---|
-| `supervised` | Pauses at milestone boundaries for review. Escalates on failure after self-healing. Default. |
-| `autonomous` | Auto-advances milestones when criteria pass. Escalates only on catastrophic failure. |
-| `strict-autonomous` | No escalation. Problem-solver handles everything. Failed tasks skipped after max retries. |
+| `supervised` | The default. Stops at each milestone so you can review, and comes to you when self-healing can't fix a failure. |
+| `autonomous` | Moves to the next milestone on its own when the criteria pass. Only stops for a catastrophic failure. |
+| `strict-autonomous` | Never stops to ask. The problem-solver handles everything, and a task that still fails after max retries gets skipped. |
 
 ### Model Tiers
 
-Not every agent needs the same model:
+Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers, and you pick a model for each under `model_tiers` in `settings.json`:
 
 | Tier | Agents | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|---|
@@ -209,31 +215,31 @@ Not every agent needs the same model:
 
 ## Customization
 
-Everything is plain markdown. Edit anything after generation:
+It's all plain text in your repo. Once it's generated, change whatever you like:
 
-- Add agents for roles the builder didn't anticipate
-- Modify skill workflows to match your actual commands
-- Update CLAUDE.md as the project evolves
-- Change autonomy mode or retry policy in settings.json
-- Add domain skills as new workflows emerge
+- Add agents for roles the builder didn't think of
+- Rewrite skill workflows to match the commands your project uses
+- Keep CLAUDE.md up to date as the project changes
+- Switch autonomy mode or retry policy in `settings.json`
+- Add a domain skill whenever you catch yourself doing the same steps twice
 
 ---
 
 ## Limitations
 
-- Best for scoped features and small-to-medium projects (up to ~25 tasks)
-- Very large or highly ambiguous systems may still need significant human oversight
-- The builder creates the development environment — not source code, PRDs, or architecture docs
-- Quality of output depends on quality of input (more detail = better agents)
+- Works best on scoped features and small-to-medium projects, roughly 25 tasks or fewer
+- Very large or very vague projects will still need a lot of human oversight
+- The builder sets up the team. It doesn't write source code, PRDs, or architecture docs; the agents it creates do that
+- The more detail you give it, the better the agents it builds
 
 ---
 
 ## Roadmap
 
-- Parallel task execution (multiple agents working simultaneously)
-- CLI installer (`npx claude-code-team-builder init`)
-- GitHub template repo for one-click setup
-- VS Code extension for dashboard integration
+- Parallel tasks, so more than one agent can work at once
+- A CLI installer (`npx claude-code-team-builder init`)
+- A GitHub template repo for one-click setup
+- A VS Code extension for the dashboard
 
 ---
 
@@ -246,8 +252,8 @@ Everything is plain markdown. Edit anything after generation:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 ## Contributing
 
-Contributions, issues, and feature requests welcome.
+Issues, feature requests, and pull requests are all welcome.

@@ -30,7 +30,7 @@ Autonomous execution loop for [Project Name].
 The loop is defined once, in `.claude/agents/orchestrator/AGENT.md`. Read that file and follow it yourself, in this session, rather than handing the loop to the orchestrator agent. That way you can pass each task straight to the right agent.
 
 1. **Reconcile State**, under State Management, before anything else
-2. **Generate the dashboard**: copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`. Do NOT regenerate it from scratch; it reads `tasks.json` and `progress.log` via fetch.
+2. **Generate the dashboard**: copy `.claude/skills/dashboard/dashboard.html` to `.claude/workspace/dashboard.html`. Do NOT regenerate it from scratch; it reads `tasks.json` and `progress.log` via fetch.
 3. **Plan** if there's no `tasks.json` yet, or with `--plan`: break the project into milestones and tasks using the Task Sizing Rules, and write `tasks.json` in the structure under State Management. With `--plan`, show the plan and stop here.
 4. **Run the Execution Loop and the Self-Healing Pipeline** exactly as written there. With `--task` or `--milestone`, run only those tasks.
 
@@ -92,7 +92,7 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 
 ## Workflow
 
-1. **Copy the template** — copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`
+1. **Copy the template** — copy `.claude/skills/dashboard/dashboard.html` to `.claude/workspace/dashboard.html`
 2. **Do NOT regenerate the HTML from scratch** — always use the fixed template. This ensures consistent styling and behavior across runs.
 3. **Instruct user**: "From `.claude/`, run `python -m http.server 8000`, then open `http://localhost:8000/workspace/dashboard.html`."
 
@@ -104,7 +104,7 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 
 ## Important
 - Serve from `.claude/`, not `.claude/workspace/`. The dashboard reads `progress.log` from its own folder and `tasks.json` from `../tasks.json`, and a server started inside `workspace/` can't reach the parent folder. Served from there, the dashboard stays on "Waiting for tasks.json...".
-- The template lives in `references/templates/dashboard.html` — do not modify it per project
+- The project's copy of the template is `.claude/skills/dashboard/dashboard.html`, taken from the team builder's `references/templates/dashboard.html`. Do not modify it per project.
 ```
 
 ---

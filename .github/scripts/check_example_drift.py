@@ -4,7 +4,8 @@
 SKILL.md (Phase 4, "copy structural sections verbatim") lists the template
 sections every generated project must copy word for word. The projects in
 examples/ are reference output, so those sections in them must match the
-templates, and their dashboard.html must be an exact copy of the template.
+templates, and both copies of dashboard.html (the dashboard skill's and the
+workspace's) must be exact copies of the template.
 
 Square-bracket placeholders in a template line, like [Project Name], match
 any text. Blank lines, horizontal rules and HTML comments are ignored.
@@ -29,6 +30,8 @@ SKILL_SECTIONS = {
     'run': ['Execution Loop'],
     'dashboard': ['How the dashboard works', 'Important'],
 }
+# Where SKILL.md (4E) puts the dashboard template in a generated project.
+DASHBOARD_COPIES = ['skills/dashboard/dashboard.html', 'workspace/dashboard.html']
 # CLAUDE.md keeps the template's general rules first, then adds its own.
 CLAUDE_MD_PREFIX_SECTIONS = ['Task Sizing']
 
@@ -130,11 +133,12 @@ def check_example(project):
     problems = []
 
     template_html = read(TEMPLATES / 'dashboard.html')
-    example_html = claude / 'workspace' / 'dashboard.html'
-    if not example_html.exists():
-        problems.append(f'{name}: no .claude/workspace/dashboard.html')
-    elif read(example_html) != template_html:
-        problems.append(f'{name}: dashboard.html is not an exact copy of the template')
+    for copy in DASHBOARD_COPIES:
+        example_html = claude / copy
+        if not example_html.exists():
+            problems.append(f'{name}: no .claude/{copy}')
+        elif read(example_html) != template_html:
+            problems.append(f'{name}: .claude/{copy} is not an exact copy of the template')
 
     agent_templates = template_blocks(TEMPLATES / 'agents.md')
     for agent_file in sorted((claude / 'agents').glob('*/AGENT.md')):

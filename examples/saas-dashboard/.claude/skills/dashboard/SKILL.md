@@ -9,7 +9,7 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 
 ## Workflow
 
-1. **Copy the template** — copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`
+1. **Copy the template** — copy `.claude/skills/dashboard/dashboard.html` to `.claude/workspace/dashboard.html`
 2. **Do NOT regenerate the HTML from scratch** — always use the fixed template
 3. **Instruct user**: "From `.claude/`, run `python -m http.server 8000`, then open `http://localhost:8000/workspace/dashboard.html`."
 
@@ -21,4 +21,4 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 
 ## Important
 - Serve from `.claude/`, not `.claude/workspace/`. The dashboard reads `progress.log` from its own folder and `tasks.json` from `../tasks.json`, and a server started inside `workspace/` can't reach the parent folder. Served from there, the dashboard stays on "Waiting for tasks.json...".
-- The template lives in `references/templates/dashboard.html` — do not modify it per project
+- The project's copy of the template is `.claude/skills/dashboard/dashboard.html`, taken from the team builder's `references/templates/dashboard.html`. Do not modify it per project.

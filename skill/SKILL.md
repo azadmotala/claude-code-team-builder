@@ -35,7 +35,7 @@ For any software project, this skill generates a complete `.claude/` directory:
 
 **Agents** use the subfolder structure (`agents/[name]/AGENT.md`). Each agent carries its own handoff protocol. Four agents are mandatory on every project: orchestrator, problem-solver, test-engineer, documentation-writer.
 
-**Skills** are two kinds:
+**Skills** are three kinds:
 - *Execution skills* — `/run`, `/status`, `/dashboard` — orchestration and monitoring
 - *Workflow skills* — `/deploy`, `/test`, `/review`, `/migrate` — developer workflows
 - *Domain skills* — tailored to what this project does (e.g., `/process-refund`, `/onboard-vendor`)

@@ -5,10 +5,12 @@ SKILL.md (Phase 4, "copy structural sections verbatim") lists the template
 sections every generated project must copy word for word. The projects in
 examples/ are reference output, so those sections in them must match the
 templates, and both copies of dashboard.html (the dashboard skill's and the
-workspace's) must be exact copies of the template.
+workspace's) must be exact copies of the template. The list of sections is
+read from that table, so the check follows SKILL.md when it changes.
 
 Square-bracket placeholders in a template line, like [Project Name], match
-any text. Blank lines, horizontal rules and HTML comments are ignored.
+any text. Blank lines, horizontal rules and HTML comments are ignored. The
+example's own markdown must not keep any placeholders.
 """
 
 import difflib
@@ -19,21 +21,56 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATES = ROOT / 'skill' / 'references' / 'templates'
 
-# Keep in step with the verbatim-sections table in skill/SKILL.md.
+SKILL_MD = ROOT / 'skill' / 'SKILL.md'
+TABLE_HEADER = '| Template | Sections to copy verbatim |'
+
+
+def verbatim_table():
+    """Return {row name: [section, ...]} from the verbatim table in SKILL.md."""
+    lines = SKILL_MD.read_text(encoding='utf-8').replace('\r\n', '\n').split('\n')
+    if TABLE_HEADER not in lines:
+        sys.exit(f'SKILL.md has no verbatim-sections table (looked for "{TABLE_HEADER}")')
+    rows = {}
+    for line in lines[lines.index(TABLE_HEADER) + 1:]:
+        if not line.startswith('|'):
+            break
+        name, sections = [cell.strip() for cell in line.strip().strip('|').split('|')]
+        if set(name) <= {'-'}:
+            continue
+        # Notes in brackets explain a row; they aren't section names.
+        rows[name] = [s.strip() for s in re.sub(r'\([^)]*\)', '', sections).split(',') if s.strip()]
+    return rows
+
+
+TABLE = verbatim_table()
+
+
+def table_row(name):
+    if name not in TABLE:
+        sys.exit(f'SKILL.md verbatim table has no "{name}" row')
+    return TABLE.pop(name)
+
+
 AGENT_SECTIONS = {
-    'orchestrator': ['Task Sizing Rules', 'State Management', 'State Summarization',
-                     'Execution Loop', 'Self-Healing Pipeline', 'Handoff Protocol'],
-    'problem-solver': ['Self-Healing Workflow', 'Handoff Protocol'],
+    'orchestrator': table_row('orchestrator'),
+    'problem-solver': table_row('problem-solver'),
 }
-OTHER_AGENT_SECTIONS = ['Handoff Protocol']
+OTHER_AGENT_SECTIONS = table_row('All other agents')
 SKILL_SECTIONS = {
-    'run': ['Execution Loop'],
-    'dashboard': ['How the dashboard works', 'Important'],
+    'run': table_row('/run skill'),
+    'dashboard': table_row('/dashboard skill'),
 }
+# CLAUDE.md keeps the template's general rules first, then adds its own.
+CLAUDE_MD_PREFIX_SECTIONS = table_row('CLAUDE.md')
+if TABLE:
+    sys.exit(f'SKILL.md verbatim table has rows this check doesn\'t know how to check: {", ".join(TABLE)}')
+
 # Where SKILL.md (4E) puts the dashboard template in a generated project.
 DASHBOARD_COPIES = ['skills/dashboard/dashboard.html', 'workspace/dashboard.html']
-# CLAUDE.md keeps the template's general rules first, then adds its own.
-CLAUDE_MD_PREFIX_SECTIONS = ['Task Sizing']
+
+# Bracketed text the templates keep as-is: path and log patterns, and empty checkboxes.
+LITERAL_BRACKETS = {' ', 'x', 'X', 'task-id', 'id', 'timestamp', 'name'}
+BRACKETED = re.compile(r'\[([^\]\n]+)\](?!\()')
 
 FENCE = re.compile(r'^\s*(```|~~~)')
 HEADING = re.compile(r'^(#{1,6})\s+(.*?)\s*$')
@@ -164,7 +201,21 @@ def check_example(project):
     for title in CLAUDE_MD_PREFIX_SECTIONS:
         problems += compare(f'{name} CLAUDE.md', claude_md_template,
                             read(claude / 'CLAUDE.md'), title, prefix=True)
+
+    problems += leftover_placeholders(claude)
     return problems
+
+
+def leftover_placeholders(claude):
+    """Find template placeholders, like [Project Name], left in generated markdown."""
+    found = []
+    for path in sorted(claude.rglob('*.md')):
+        for number, line in enumerate(read(path).split('\n'), start=1):
+            for match in BRACKETED.finditer(line):
+                if match.group(1) not in LITERAL_BRACKETS:
+                    where = path.relative_to(ROOT).as_posix()
+                    found.append(f'{where}:{number}: leftover placeholder [{match.group(1)}]')
+    return found
 
 
 def main():

@@ -18,7 +18,7 @@ Autonomous execution loop for TenantFlow.
 The loop is defined once, in `.claude/agents/orchestrator/AGENT.md`. Read that file and follow it yourself, in this session, rather than handing the loop to the orchestrator agent. That way you can pass each task straight to the right agent.
 
 1. **Reconcile State**, under State Management, before anything else
-2. **Generate the dashboard**: copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`. Do NOT regenerate it from scratch; it reads `tasks.json` and `progress.log` via fetch.
+2. **Generate the dashboard**: copy `.claude/skills/dashboard/dashboard.html` to `.claude/workspace/dashboard.html`. Do NOT regenerate it from scratch; it reads `tasks.json` and `progress.log` via fetch.
 3. **Plan** if there's no `tasks.json` yet, or with `--plan`: break the project into milestones and tasks using the Task Sizing Rules, and write `tasks.json` in the structure under State Management. With `--plan`, show the plan and stop here.
 4. **Run the Execution Loop and the Self-Healing Pipeline** exactly as written there. With `--task` or `--milestone`, run only those tasks.
 

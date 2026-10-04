@@ -23,6 +23,7 @@ For any software project, this skill generates a complete `.claude/` directory:
 │   ├── run/SKILL.md                       ← autonomous execution loop
 │   ├── status/SKILL.md                    ← project state reporting
 │   ├── dashboard/SKILL.md                 ← visual progress tracker
+│   ├── dashboard/dashboard.html           ← the project's copy of the dashboard template
 │   ├── deploy/SKILL.md                    ← workflow skill
 │   ├── test/SKILL.md                      ← workflow skill
 │   ├── review/SKILL.md                    ← workflow skill
@@ -247,7 +248,11 @@ Models are not set here. Each agent's tier goes in its own `model:` frontmatter 
 
 ### 4E: workspace directory and dashboard
 
-Create `.claude/workspace/` as an empty directory. Copy `references/templates/dashboard.html` into `.claude/workspace/dashboard.html`. Do NOT generate dashboard HTML from scratch — always use the fixed template.
+Create `.claude/workspace/`. Copy `references/templates/dashboard.html` to two places in the project:
+- `.claude/skills/dashboard/dashboard.html` — the project's own copy of the template. `/run` and `/dashboard` copy from here, because `references/templates/` exists only where the team builder is installed.
+- `.claude/workspace/dashboard.html` — the page the user opens.
+
+Do NOT generate dashboard HTML from scratch — always use the fixed template.
 
 The orchestrator will populate the workspace with:
 - `orchestrator_state.json` — persistent state across sessions
@@ -270,7 +275,7 @@ Before finishing, verify:
 - ✅ CLAUDE.md includes agent routing, skill list, domain concepts, completion criteria, and conventions
 - ✅ team.json includes autonomy, retry, and self-healing configuration, and `.claude/settings.json` was not created or changed
 - ✅ Every agent's `model:` frontmatter matches its tier (planning, execution, validation) for the chosen model balance
-- ✅ `dashboard.html` in workspace is the fixed template copied from `references/templates/dashboard.html`
+- ✅ `.claude/skills/dashboard/dashboard.html` and `.claude/workspace/dashboard.html` are both exact copies of `references/templates/dashboard.html`
 - ✅ Execution skills (`/run`, `/status`, `/dashboard`) included
 - ✅ At least 2 workflow/domain skills created
 - ✅ No PRDs, specs, architecture docs, or source code created
@@ -291,4 +296,4 @@ Then summarize:
 - `references/templates/agents.md` — agent file templates for each role (including orchestrator + problem-solver)
 - `references/templates/skills.md` — skill file templates for execution, workflow, and domain skills
 - `references/templates/claude-md.md` — CLAUDE.md structure template
-- `references/templates/dashboard.html` — fixed dashboard template (copy to workspace, do not regenerate)
+- `references/templates/dashboard.html` — fixed dashboard template (copy into the project's dashboard skill and workspace, do not regenerate)

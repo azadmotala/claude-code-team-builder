@@ -1,8 +1,9 @@
 <img width="830" height="300" alt="claude-code-team-builder" src="https://github.com/user-attachments/assets/e0fb3bda-476e-438c-98c3-53f40f0bda67" />
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://docs.anthropic.com/en/docs/claude-code)
+[![Checks](https://github.com/azadmotala/claude-code-team-builder/actions/workflows/checks.yml/badge.svg?branch=master)](https://github.com/azadmotala/claude-code-team-builder/actions/workflows/checks.yml)
 [![Latest release](https://img.shields.io/github/v/release/azadmotala/claude-code-team-builder?color=green)](https://github.com/azadmotala/claude-code-team-builder/releases/latest)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://code.claude.com/docs/en/overview)
 
 
 A Claude Code skill that builds a self-healing AI development team for your software project.
@@ -245,7 +246,7 @@ It's all plain text in your repo. Once it's generated, change whatever you like:
 
 ## Requirements
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed and configured
+- [Claude Code](https://code.claude.com/docs/en/overview) installed and configured
 - A project idea (even a rough one works)
 
 ---

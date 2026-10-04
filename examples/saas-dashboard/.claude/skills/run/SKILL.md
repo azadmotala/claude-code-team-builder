@@ -16,6 +16,7 @@ Autonomous execution loop for TenantFlow.
 ## Execution Loop
 
 ### 0. Reconcile State (always first)
+- Read `.claude/team.json` for the autonomy `mode` and the `retry_policy`
 - Read `.claude/workspace/orchestrator_state.json` if it exists
 - Read `.claude/tasks.json`
 - Scan `.claude/workspace/` for result files
@@ -48,7 +49,7 @@ Autonomous execution loop for TenantFlow.
 - If any fail → enter self-healing pipeline
 
 ### 5. Self-healing pipeline (on failure)
-Read retry policy from `settings.json`. Classify the failure first:
+Read retry policy from `.claude/team.json`. Classify the failure first:
 
 **Simple failure** (syntax error, missing import, typo, wrong path):
 - Retry once with the same agent plus a hint describing the error

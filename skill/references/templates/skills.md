@@ -28,6 +28,7 @@ Autonomous execution loop for [Project Name].
 ## Execution Loop
 
 ### 0. Reconcile State (always first)
+- Read `.claude/team.json` for the autonomy `mode` and the `retry_policy`
 - Read `.claude/workspace/orchestrator_state.json` if it exists
 - Read `.claude/tasks.json`
 - Scan `.claude/workspace/` for result files
@@ -60,7 +61,7 @@ Autonomous execution loop for [Project Name].
 - If any fail → enter self-healing pipeline
 
 ### 5. Self-healing pipeline (on failure)
-Read retry policy from `settings.json`. Classify the failure first:
+Read retry policy from `.claude/team.json`. Classify the failure first:
 
 **Simple failure** (syntax error, missing import, typo, wrong path):
 - Retry once with the same agent plus a hint describing the error
@@ -87,6 +88,7 @@ Read retry policy from `settings.json`. Classify the failure first:
 - If not → continue to next milestone
 
 ## State Files
+- `team.json` — autonomy mode, retry policy, and self-healing settings
 - `tasks.json` — every task, in the structure and with the status list defined under State Management in `.claude/agents/orchestrator/AGENT.md`
 - `workspace/orchestrator_state.json` — persistent orchestrator memory
 - `workspace/progress.log` — human-readable task transition log

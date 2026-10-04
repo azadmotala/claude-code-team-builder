@@ -12,7 +12,7 @@ For any software project, this skill generates a complete `.claude/` directory:
 ```
 .claude/
 ├── CLAUDE.md                              ← project context Claude reads every session
-├── settings.json                          ← orchestration + autonomy configuration
+├── team.json                              ← orchestration + autonomy configuration
 ├── agents/
 │   ├── orchestrator/AGENT.md              ← mandatory: plans, assigns, validates
 │   ├── problem-solver/AGENT.md            ← mandatory: self-healing, task repair
@@ -39,7 +39,7 @@ For any software project, this skill generates a complete `.claude/` directory:
 - *Workflow skills* — `/deploy`, `/test`, `/review`, `/migrate` — developer workflows
 - *Domain skills* — tailored to what this project does (e.g., `/process-refund`, `/onboard-vendor`)
 
-**settings.json** controls orchestration behavior: autonomy mode, retry policy, and the self-healing pipeline.
+**team.json** controls orchestration behavior: autonomy mode, retry policy, and the self-healing pipeline.
 
 **This skill does NOT create:**
 - PRDs, architecture documents, or specs (the documentation-writer agent does that)
@@ -212,7 +212,9 @@ Use `references/templates/claude-md.md` as the structure. It must include:
 
 Keep CLAUDE.md under 130 lines. Dense but scannable.
 
-### 4D: settings.json
+### 4D: team.json
+
+Write the orchestration settings to `.claude/team.json`:
 
 ```json
 {
@@ -236,6 +238,8 @@ Keep CLAUDE.md under 130 lines. Dense but scannable.
   }
 }
 ```
+
+Do not create or edit `.claude/settings.json`. That file is Claude Code's own project settings (permissions, hooks, plugins, environment variables), an existing project may already have one, and Claude Code doesn't use the team builder's keys.
 
 The `mode` field is the only switch for milestone pauses and escalation. It accepts three values:
 - `"supervised"` — pauses for human review at every milestone boundary, and stops to ask when a task still fails after self-healing (default)
@@ -271,7 +275,7 @@ Before finishing, verify:
 - ✅ Every agent description references this project's actual tech stack and domain
 - ✅ CLAUDE.md Task Sizing has general rules plus project-specific lines
 - ✅ CLAUDE.md includes agent routing, skill list, domain concepts, completion criteria, and conventions
-- ✅ settings.json includes autonomy, retry, self-healing, and model tier configuration
+- ✅ team.json includes autonomy, retry, self-healing, and model tier configuration, and `.claude/settings.json` was not created or changed
 - ✅ `dashboard.html` in workspace is the fixed template copied from `references/templates/dashboard.html`
 - ✅ Execution skills (`/run`, `/status`, `/dashboard`) included
 - ✅ At least 2 workflow/domain skills created

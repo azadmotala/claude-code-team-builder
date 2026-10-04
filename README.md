@@ -206,13 +206,13 @@ Set `autonomy.mode` in `team.json`:
 
 Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers. The builder asks how you want to balance cost and quality, then writes each agent's model into the `model:` line at the top of its `AGENT.md`. To change a tier later, edit that line in each agent in the tier.
 
-| Tier | Agents | Default | Cost-optimized | Quality-maximized |
-|---|---|---|---|---|
-| Planning | orchestrator, problem-solver | sonnet | sonnet | fable |
-| Execution | developer agents, devops | sonnet | sonnet | sonnet |
-| Validation | test-engineer, code-reviewer, docs | sonnet | haiku | sonnet |
+| Tier | Agents | Cost-optimized | Default | Balanced | Quality-maximized |
+|---|---|---|---|---|---|
+| Planning | orchestrator, problem-solver | sonnet | sonnet | opus | fable |
+| Execution | developer agents, devops | sonnet | sonnet | sonnet | sonnet |
+| Validation | test-engineer, code-reviewer, docs | haiku | sonnet | sonnet | sonnet |
 
-`opus` is the middle ground for planning when Fable costs more than you want. These are Claude Code's model aliases, so each agent always gets the latest model in its family.
+Balanced puts planning on `opus`. Quality-maximized goes further, to `fable`, for the hardest planning work at a higher price. These are Claude Code's model aliases, so each agent always gets the latest model in its family.
 
 `/run` drives the loop from your main session, so the loop itself runs on that session's model. The planning tier covers the problem-solver, and the orchestrator whenever it runs as a subagent.
 

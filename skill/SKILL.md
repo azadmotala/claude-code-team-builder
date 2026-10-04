@@ -120,7 +120,11 @@ Not every agent needs the same model. Assign based on the reasoning complexity o
 | Execution | sonnet | All developer agents, `devops-engineer` | Focused code generation within a well-defined scope. Sonnet handles this well. |
 | Validation | sonnet (or haiku) | `test-engineer`, `code-reviewer`, `documentation-writer` | Checking criteria against output, reviewing code patterns, writing structured docs. Haiku is sufficient for simple validation tasks if the user wants to optimize cost. |
 
-Ask the user during discovery (question 11) for their preference. Default: sonnet for all agents. If they want cost optimization, drop validation agents to haiku. If they want maximum quality, upgrade planning agents to fable, or to opus if they want better planning without Fable's price.
+Ask the user during discovery (question 11) which profile they want:
+- **Default**: sonnet for all agents
+- **Cost-optimized**: validation agents drop to haiku
+- **Balanced**: planning agents move up to opus
+- **Quality-maximized**: planning agents move up to fable
 
 Write each agent's model into the `model:` line of its frontmatter. That line is the only thing Claude Code reads to choose a subagent's model, so it's where the tier lives; there is no separate tier setting. To change a tier later, edit `model:` in every agent in that tier.
 

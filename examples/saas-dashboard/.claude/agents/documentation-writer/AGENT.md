@@ -28,6 +28,6 @@ One PRD per feature, focused on acceptance criteria. Client-facing docs should b
 ## Handoff Protocol
 When you finish a task:
 1. Write a result file to `.claude/workspace/[task-id].result.md`
-2. Include: documents created/updated, key decisions documented, any open questions for stakeholders
+2. Include: what was documented, file paths created/updated, a summary of key decisions captured
 3. Include a checklist of acceptance criteria with evidence for each
 4. Do not call other agents directly — the orchestrator validates and decides next steps

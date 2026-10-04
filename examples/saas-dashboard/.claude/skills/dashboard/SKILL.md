@@ -11,7 +11,7 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 
 1. **Copy the template** — copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`
 2. **Do NOT regenerate the HTML from scratch** — always use the fixed template
-3. **Instruct user**: "Open in a browser. Serve with `python -m http.server 8000` from `.claude/workspace/` for auto-refresh."
+3. **Instruct user**: "From `.claude/`, run `python -m http.server 8000`, then open `http://localhost:8000/workspace/dashboard.html`."
 
 ## How the dashboard works
 - Reads `tasks.json` and `progress.log` via fetch (relative paths)
@@ -20,6 +20,5 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 - No generation needed — the same HTML file works for any project because it reads task data dynamically
 
 ## Important
-- The dashboard must be served from `.claude/workspace/` so it can find `tasks.json` and `progress.log`
-- If `tasks.json` is in `.claude/` (one level up), the dashboard tries `../tasks.json` as a fallback
+- Serve from `.claude/`, not `.claude/workspace/`. The dashboard reads `progress.log` from its own folder and `tasks.json` from `../tasks.json`, and a server started inside `workspace/` can't reach the parent folder. Served from there, the dashboard stays on "Waiting for tasks.json...".
 - The template lives in `references/templates/dashboard.html` — do not modify it per project

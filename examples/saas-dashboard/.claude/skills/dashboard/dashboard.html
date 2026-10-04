@@ -136,6 +136,12 @@ function getStatusClass(status) {
 
 const STATUS_LABELS = { done: 'DONE', in_progress: 'IN PROGRESS', pending: 'PENDING', blocked: 'BLOCKED', failed: 'FAILED', review: 'REVIEW', skipped: 'SKIPPED' };
 
+// Task names, agent names and log lines are written by agents. Escape them so text
+// like "<Header>" shows as written instead of being read as HTML.
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // "Blocked" isn't stored in tasks.json: a pending task is blocked while any of its depends_on isn't done.
 function effectiveStatus(task, statusById) {
   const s = getStatusClass(task.status);
@@ -191,7 +197,10 @@ async function refresh() {
   const logText = await loadText('progress.log');
 
   if (!data) {
-    document.getElementById('subtitle').textContent = 'Waiting for tasks.json...';
+    // Pages not served over http(s), such as file://, aren't allowed to fetch tasks.json
+    document.getElementById('subtitle').textContent = !location.protocol.startsWith('http')
+      ? 'Opened straight from disk, so the browser won\'t let this page read tasks.json. From .claude/, run "python -m http.server 8000", then open http://localhost:8000/workspace/dashboard.html'
+      : 'Waiting for tasks.json...';
     return;
   }
 
@@ -266,7 +275,7 @@ async function refresh() {
     const mPct = mTotal > 0 ? Math.round((mDone / mTotal) * 100) : 0;
     const fillClass = mPct === 100 ? 'milestone-bar-fill-done' : mPct > 0 ? 'milestone-bar-fill-partial' : 'milestone-bar-fill-zero';
     return '<div class="milestone">' +
-      '<div class="milestone-row"><span class="milestone-name">' + (m.title || m.id) + '</span><span class="milestone-pct">' + mPct + '%</span></div>' +
+      '<div class="milestone-row"><span class="milestone-name">' + esc(m.title || m.id) + '</span><span class="milestone-pct">' + mPct + '%</span></div>' +
       '<div class="milestone-bar-bg"><div class="milestone-bar-fill ' + fillClass + '" style="width:' + mPct + '%"></div></div>' +
       '</div>';
   }).join('');
@@ -276,8 +285,8 @@ async function refresh() {
   tasksEl.innerHTML = tasks.map(t => {
     return '<div class="task">' +
       '<span class="task-badge task-badge-' + t._status + '">' + STATUS_LABELS[t._status] + '</span>' +
-      '<div class="task-info"><div class="task-name">' + (t.name || t.title || t.id) + '</div>' +
-      '<div class="task-meta">' + (t.agent || '') + (t.id ? ' · ' + t.id : '') + '</div></div></div>';
+      '<div class="task-info"><div class="task-name">' + esc(t.name || t.title || t.id) + '</div>' +
+      '<div class="task-meta">' + esc(t.agent || '') + (t.id ? ' · ' + esc(t.id) : '') + '</div></div></div>';
   }).join('');
 
   // Timeline
@@ -288,7 +297,7 @@ async function refresh() {
   } else {
     timelineEl.innerHTML = entries.map(line => {
       const dotClass = getTimelineDotClass(line);
-      return '<div class="timeline-entry"><span class="timeline-dot timeline-dot-' + dotClass + '"></span><span class="timeline-text">' + line + '</span></div>';
+      return '<div class="timeline-entry"><span class="timeline-dot timeline-dot-' + dotClass + '"></span><span class="timeline-text">' + esc(line) + '</span></div>';
     }).join('');
   }
 

@@ -34,7 +34,7 @@ You are the orchestrator for TenantFlow, a multi-tenant SaaS dashboard built wit
 7. If a task is `in_progress` with no result file, the last session ended mid-task: set it back to `pending`
 8. If a task is `in_progress` with a result file, validate it now, as in the Execution Loop
 9. If a task is `review`, check its acceptance criteria against the project files: mark it `done` if they pass, otherwise `pending`
-10. If a task is `failed` and its `attempts` is below `max_retries`, run the Self-Healing Pipeline for it before picking new work. If it has reached `max_retries`, go straight to the Escalate step.
+10. If a task is `failed`, run the Self-Healing Pipeline for it before picking new work. Its Retry budget decides the next repair, or Escalate if the task has used every retry.
 11. Write status changes to `tasks.json` and the reconciled state to `orchestrator_state.json`
 
 ### tasks.json structure
@@ -133,7 +133,10 @@ Before decomposing, calibrate granularity to the project's actual complexity:
 
 ## Self-Healing Pipeline
 
-When a task fails, classify the failure before choosing a response:
+When a task fails, classify the failure before choosing a response.
+
+### Retry budget
+`attempts` counts failed validations (Execution Loop step 7 adds 1 on each failure). Each failure earns one retry or repair, up to `max_retries` in `.claude/team.json` (4 by default). A simple failure's plain retry uses one of them, in place of the first refine. Once `attempts` is above `max_retries`, the task has used every retry: go to Escalate.
 
 ### Simple failures (syntax error, missing import, typo, file path wrong)
 - **Retry once** with the same agent plus a hint describing the error
@@ -144,10 +147,10 @@ When a task fails, classify the failure before choosing a response:
 - Invoke the problem-solver immediately — these won't resolve with a retry
 
 ### Full pipeline (when problem-solver is invoked):
-1. **Refine instructions** (attempt 1–2): Problem-solver rewrites the task with more detail, clearer acceptance criteria, or additional context
-2. **Split task** (attempt 3): Problem-solver decomposes into 2–3 smaller subtasks
-3. **Reassign agent** (attempt 4): Try a different agent if one is qualified
-4. **Escalate** (after max retries): in `supervised` or `autonomous` mode, pause and ask the human. In `strict-autonomous` mode, mark the task `skipped`, log the failure, and move to the next task.
+1. **Refine instructions** (`attempts` 1–2): Problem-solver rewrites the task with more detail, clearer acceptance criteria, or additional context
+2. **Split task** (`attempts` 3): Problem-solver decomposes into 2–3 smaller subtasks
+3. **Reassign agent** (`attempts` 4): Try a different agent if one is qualified
+4. **Escalate** (`attempts` above `max_retries`): in `supervised` or `autonomous` mode, pause and ask the human. In `strict-autonomous` mode, mark the task `skipped`, log the failure, and move to the next task.
 
 Once the problem-solver has repaired a task, set it back to `pending` so the Execution Loop picks it up again.
 

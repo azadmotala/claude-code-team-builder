@@ -75,6 +75,6 @@ Use in Q&A mode — present one section at a time. Skip questions whose answers 
 | Compliance | None specified |
 | Autonomy mode | Supervised |
 | Model balance | Sonnet for all agents |
-| Retry policy | 4 retries, refine-then-split strategy |
+| Retry policy | 4 retries, classify-then-act strategy |
 
 Always state assumptions explicitly in the CLAUDE.md "Assumptions" section if key details were inferred rather than provided.

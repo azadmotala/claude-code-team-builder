@@ -32,7 +32,7 @@ Most multi-agent setups need something running outside your editor: cloud APIs, 
 
 **State that survives a crash.** Every session starts by syncing `tasks.json`, the workspace result files, and `orchestrator_state.json`. Interrupted sessions, manual edits, and crashed processes all get straightened out before any new work starts.
 
-**Easy on tokens.** The orchestrator carries a one-line summary of each finished task and leaves the full results on disk, so context grows with the number of tasks. You can run planning on Opus and validation on Haiku. Its task sizing rules stop it splitting work too finely, so there are fewer agent handoffs to pay for.
+**Easy on tokens.** The orchestrator carries a one-line summary of each finished task and leaves the full results on disk, so context grows with the number of tasks. You can run planning on Fable or Opus and validation on Haiku. Its task sizing rules stop it splitting work too finely, so there are fewer agent handoffs to pay for.
 
 **A dashboard you can leave open.** One self-contained HTML file that reads task state from disk and refreshes every 5 seconds. Milestone progress, task status, and an activity timeline, all in your browser.
 
@@ -208,9 +208,13 @@ Planning needs the strongest reasoning. Checking a result against its criteria d
 
 | Tier | Agents | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|---|
-| Planning | orchestrator, problem-solver | sonnet | sonnet | opus |
+| Planning | orchestrator, problem-solver | sonnet | sonnet | fable |
 | Execution | developer agents, devops | sonnet | sonnet | sonnet |
 | Validation | test-engineer, code-reviewer, docs | sonnet | haiku | sonnet |
+
+`opus` is the middle ground for planning when Fable costs more than you want. These are Claude Code's model aliases, so each agent always gets the latest model in its family.
+
+`/run` drives the loop from your main session, so the loop itself runs on that session's model. The planning tier covers the problem-solver, and the orchestrator whenever it runs as a subagent.
 
 ---
 

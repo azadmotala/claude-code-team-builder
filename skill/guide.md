@@ -235,10 +235,12 @@ Three things keep token use in step with the size of the project:
 
 | Tier | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|
-| Planning (orchestrator, problem-solver) | sonnet | sonnet | opus |
+| Planning (orchestrator, problem-solver) | sonnet | sonnet | fable |
 | Execution (developer agents, devops) | sonnet | sonnet | sonnet |
 | Validation (test-engineer, code-reviewer, docs) | sonnet | haiku | sonnet |
 
-The cost-optimized profile drops validation to haiku, since checking output against criteria is lighter work than planning or writing code. The quality-maximized profile moves planning up to opus for better task breakdowns and failure diagnosis. To change a tier later, edit `model:` in each agent in that tier.
+The cost-optimized profile drops validation to haiku, since checking output against criteria is lighter work than planning or writing code. The quality-maximized profile moves planning up to fable, Anthropic's model for the hardest and longest-running work, for better task breakdowns and failure diagnosis. `opus` is the middle ground if Fable costs more than you want. These are Claude Code's model aliases, so each agent always gets the latest model in its family. To change a tier later, edit `model:` in each agent in that tier.
+
+`/run` drives the loop from your main session, so the loop itself runs on that session's model. The planning tier covers the problem-solver, and the orchestrator whenever it runs as a subagent.
 
 **Right-sized tasks.** The task sizing rules (see [Tasks](#tasks)) stop the orchestrator splitting work too finely. On a project with 1–3 output files, the orchestrator aims for 3–5 tasks in total, build and validation included. Fewer tasks means fewer agent runs and fewer result files to read back.

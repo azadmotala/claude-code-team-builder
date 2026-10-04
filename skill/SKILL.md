@@ -116,13 +116,17 @@ Not every agent needs the same model. Assign based on the reasoning complexity o
 
 | Tier | Model | Agents | Why |
 |---|---|---|---|
-| Planning | opus (or sonnet) | `orchestrator`, `problem-solver` | Task decomposition, failure diagnosis, and dependency reasoning require the strongest planning ability. Use opus if the user's model balance preference allows it; otherwise sonnet. |
+| Planning | sonnet (opus or fable for higher quality) | `orchestrator`, `problem-solver` | Task decomposition, failure diagnosis, and dependency reasoning require the strongest planning ability. Use fable for maximum quality, or opus as the middle ground, if the user's model balance allows it; otherwise sonnet. |
 | Execution | sonnet | All developer agents, `devops-engineer` | Focused code generation within a well-defined scope. Sonnet handles this well. |
 | Validation | sonnet (or haiku) | `test-engineer`, `code-reviewer`, `documentation-writer` | Checking criteria against output, reviewing code patterns, writing structured docs. Haiku is sufficient for simple validation tasks if the user wants to optimize cost. |
 
-Ask the user during discovery (question 11) for their preference. Default: sonnet for all agents. If they want cost optimization, drop validation agents to haiku. If they want maximum quality, upgrade planning agents to opus.
+Ask the user during discovery (question 11) for their preference. Default: sonnet for all agents. If they want cost optimization, drop validation agents to haiku. If they want maximum quality, upgrade planning agents to fable, or to opus if they want better planning without Fable's price.
 
 Write each agent's model into the `model:` line of its frontmatter. That line is the only thing Claude Code reads to choose a subagent's model, so it's where the tier lives; there is no separate tier setting. To change a tier later, edit `model:` in every agent in that tier.
+
+Write the alias (`fable`, `opus`, `sonnet`, `haiku`), not a full model ID. Each alias resolves to the latest model in its family, so generated agents don't go stale. Use a full ID such as `claude-opus-5-5` only if the user wants to pin a version.
+
+`/run` runs the execution loop in the main session, so the loop itself uses the session's model. The planning tier covers the problem-solver, and the orchestrator whenever it runs as a subagent.
 
 ---
 

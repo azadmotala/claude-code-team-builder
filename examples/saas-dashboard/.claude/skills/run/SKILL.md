@@ -22,15 +22,20 @@ Autonomous execution loop for TenantFlow.
 - If a task is marked `done` in tasks.json but has no result file → mark as `review`
 - If a result file exists but tasks.json shows `pending` → validate and mark `done` if criteria pass
 - Write reconciled state to `orchestrator_state.json`
+- This prevents drift from interrupted sessions or manual edits
 
 ### 1. Generate dashboard
-- Copy dashboard template to `.claude/workspace/dashboard.html`
+- Copy `references/templates/dashboard.html` to `.claude/workspace/dashboard.html`
+- Do NOT regenerate from scratch — always use the fixed template
+- The dashboard reads `tasks.json` and `progress.log` dynamically via fetch
 
 ### 2. Pick next ready task
 - Find the highest-priority task with status `pending` and all dependencies in status `done`
+- If no tasks are ready, check for blocked tasks and report why
 
 ### 3. Assign to agent
 - Use CLAUDE.md agent routing to select the correct agent
+- Invoke the agent with the task definition and acceptance criteria
 
 ### 4. Validate result
 - Read the agent's result file from `.claude/workspace/[task-id].result.md`
@@ -39,12 +44,28 @@ Autonomous execution loop for TenantFlow.
 - If any fail → enter self-healing pipeline
 
 ### 5. Self-healing pipeline (on failure)
-- Simple failure → retry once with hint
-- Structural failure → invoke problem-solver
-- Problem-solver pipeline: refine → split → reassign → escalate
+Read retry policy from `settings.json`. Classify the failure first:
+
+**Simple failure** (syntax error, missing import, typo, wrong path):
+- Retry once with the same agent plus a hint describing the error
+- Do NOT invoke the problem-solver — the round-trip costs more than a retry
+- If retry also fails → escalate to problem-solver
+
+**Structural failure** (wrong decomposition, missing dependency, vague criteria):
+- Invoke the problem-solver immediately
+
+**Problem-solver pipeline** (when invoked):
+1. **Refine** (attempts 1–2): problem-solver rewrites the task
+2. **Split** (attempt 3): problem-solver decomposes into subtasks
+3. **Reassign** (attempt 4): try a different qualified agent
+4. **Escalate or skip**: based on `settings.json` autonomy mode
 
 ### 6. Milestone boundary
-- Auto-advance if `auto_advance_milestones` is true and all tasks pass
+- When all tasks in a milestone are `done`:
+  - If `auto_advance_milestones` is true → validate milestone outputs and advance
+  - If false → pause and ask for human review
 
 ### 7. Completion check
-- Check project completion criteria from CLAUDE.md
+- After each milestone, check project completion criteria from CLAUDE.md
+- If all criteria met → report project complete
+- If not → continue to next milestone

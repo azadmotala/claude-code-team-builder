@@ -83,7 +83,8 @@ Built with: Next.js 14 + Prisma + PostgreSQL · Hosted on Vercel + Railway · Cl
 - A task is the smallest unit of work that produces a testable deliverable
 - Do not split work below the file boundary unless sections are independently testable by different agents
 - If two pieces of work modify the same file with no external dependencies, they are one task
-- If two validation checks read the same file, use the same agent, and share the same dependencies, they are one task
+- If two validation checks read the same file, use the same agent, and share the same dependencies, they are one task — not two
+- For projects with 5 or fewer output files, all validation (testing, review, conventions) is one task — do not split into separate test and review tasks
 - This is a multi-service app with 30+ files — target 10–15 total tasks
 - Tenant isolation validation is part of every code review task, not a separate task
 

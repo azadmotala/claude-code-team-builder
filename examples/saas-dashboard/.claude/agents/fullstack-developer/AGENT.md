@@ -29,6 +29,6 @@ Build the smallest working slice first, then iterate. Every database query must 
 ## Handoff Protocol
 When you finish a task:
 1. Write a result file to `.claude/workspace/[task-id].result.md`
-2. Include: files created/modified, components built, API routes added, schema changes, tenant isolation verified
+2. Include: what was built, files created/modified, any schema changes, integration points
 3. Include a checklist of acceptance criteria with evidence for each
 4. Do not call other agents directly — the orchestrator validates and decides next steps

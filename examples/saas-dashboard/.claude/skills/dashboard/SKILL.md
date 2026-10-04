@@ -16,7 +16,7 @@ Copies the dashboard template to `.claude/workspace/dashboard.html`.
 ## How the dashboard works
 - Reads `tasks.json` and `progress.log` via fetch (relative paths)
 - Auto-refreshes every 5 seconds
-- Shows: status counts, overall progress bar, milestone progress bars, task list with status badges, activity timeline
+- Shows: status counts (done, in progress, pending, blocked, failed), overall progress bar, milestone progress bars, task list with status badges, activity timeline from progress.log
 - No generation needed — the same HTML file works for any project because it reads task data dynamically
 
 ## Important

@@ -31,6 +31,6 @@ The critical path for TenantFlow is: tenant registration → data isolation → 
 ## Handoff Protocol
 When you finish a task:
 1. Write a result file to `.claude/workspace/[task-id].result.md`
-2. Include: tests written, pass/fail results, coverage changes, any regressions found
+2. Include: what was tested, pass/fail counts, any failures with error details, coverage summary
 3. Include a checklist of acceptance criteria with evidence for each
 4. Do not call other agents directly — the orchestrator validates and decides next steps

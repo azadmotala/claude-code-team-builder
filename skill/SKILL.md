@@ -178,7 +178,7 @@ Structural sections that must be copied verbatim from the templates:
 | orchestrator | Task Sizing Rules, State Management, State Summarization, Execution Loop, Self-Healing Pipeline, Handoff Protocol |
 | problem-solver | Self-Healing Workflow, Handoff Protocol |
 | All other agents | Handoff Protocol |
-| /run skill | Execution Loop (all steps including Reconcile State, Self-healing pipeline) |
+| /run skill | Execution Loop (it points at the orchestrator's loop rather than repeating it) |
 | /dashboard skill | How the dashboard works, Important |
 | CLAUDE.md | Task Sizing (copy general rules, then add project-specific lines below them) |
 

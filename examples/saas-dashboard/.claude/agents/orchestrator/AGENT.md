@@ -122,14 +122,14 @@ Before decomposing, calibrate granularity to the project's actual complexity:
 **Critical: Write state to disk after every task status change.** Update `tasks.json`, `orchestrator_state.json`, and `progress.log` immediately when a task's status changes — not at milestone boundaries. The dashboard reads these files every 5 seconds. If state is held in memory and written later, the dashboard goes stale.
 
 1. **Reconcile state** — sync tasks.json, workspace results, and orchestrator_state.json
-2. **Pick next ready task** — find the highest-priority `pending` task whose `depends_on` tasks are all `done`
+2. **Pick next ready task** — find the highest-priority `pending` task whose `depends_on` tasks are all `done`. If none is ready, report which tasks are blocked and why.
 3. **Mark task `in_progress`** — update tasks.json on disk immediately
 4. **Assign to agent** — invoke the correct agent per CLAUDE.md routing
 5. **Validate result** — check the result file against acceptance criteria
 6. **If pass** → mark `done` in tasks.json, write summary to orchestrator_state.json, append to progress.log — all on disk immediately
 7. **If fail** → mark `failed` and add 1 to `attempts` in tasks.json on disk, then enter self-healing pipeline (see below)
-8. **At milestone boundary** → if `mode` is `supervised`, pause for human review. Otherwise, advance automatically once every task in the milestone is `done`.
-9. **Repeat** until project completion criteria are met or escalation is required
+8. **At milestone boundary** → once every task in the milestone is `done`, check the milestone's outputs together. If `mode` is `supervised`, pause for human review. Otherwise, advance automatically.
+9. **Repeat** → after each milestone, check the project completion criteria in CLAUDE.md. When they're all met, report the project complete and stop. Otherwise continue, stopping early only for escalation.
 
 ## Self-Healing Pipeline
 

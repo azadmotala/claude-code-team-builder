@@ -13,6 +13,9 @@
   .badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-executing { background: #2563eb; color: #fff; }
   .badge-complete { background: #16a34a; color: #fff; }
+  .badge-stale { background: #475569; color: #fff; }
+  body.stale .grid { opacity: 0.45; }
+  body.stale .subtitle { color: #fbbf24; }
   .subtitle { font-size: 13px; color: #64748b; margin-bottom: 28px; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -188,6 +191,17 @@ function getTimelineDotClass(line) {
   return 'info';
 }
 
+let lastLoaded = null; // local time of the last successful refresh
+
+// Keep the last good data on screen, but make it obvious it's out of date
+function showStale(reason) {
+  document.body.classList.add('stale');
+  const badge = document.getElementById('status-badge');
+  badge.textContent = 'STALE';
+  badge.className = 'badge badge-stale';
+  document.getElementById('subtitle').textContent = reason + ' Showing data from ' + lastLoaded + '.';
+}
+
 async function refresh() {
   // tasks.json lives in .claude/, one level up. Older setups kept it next to the dashboard.
   let data = await loadJSON('../tasks.json');
@@ -196,12 +210,18 @@ async function refresh() {
   const logText = await loadText('progress.log');
 
   if (!data) {
+    if (lastLoaded) {
+      showStale('Couldn\'t read tasks.json at ' + new Date().toLocaleTimeString() + '.');
+      return;
+    }
     // Pages not served over http(s), such as file://, aren't allowed to fetch tasks.json
     document.getElementById('subtitle').textContent = !location.protocol.startsWith('http')
       ? 'Opened straight from disk, so the browser won\'t let this page read tasks.json. From .claude/, run "python -m http.server 8000", then open http://localhost:8000/workspace/dashboard.html'
       : 'Waiting for tasks.json...';
     return;
   }
+
+  document.body.classList.remove('stale');
 
   // Normalize: handle both array and object formats
   let tasks = [];
@@ -302,10 +322,22 @@ async function refresh() {
 
   // Footer
   document.getElementById('footer').textContent = projectName + ' Dashboard · Generated ' + now;
+  lastLoaded = now;
 }
 
-refresh();
-setInterval(refresh, REFRESH_MS);
+// Schedule each refresh after the last one finishes, so slow loads never overlap
+async function loop() {
+  try {
+    await refresh();
+  } catch (err) {
+    if (lastLoaded) showStale('Couldn\'t show tasks.json: ' + err.message + '.');
+    else document.getElementById('subtitle').textContent = 'Couldn\'t show tasks.json: ' + err.message;
+  } finally {
+    setTimeout(loop, REFRESH_MS);
+  }
+}
+
+loop();
 </script>
 </body>
 </html>

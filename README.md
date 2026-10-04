@@ -44,11 +44,22 @@ Most multi-agent setups need something running outside your editor: cloud APIs, 
 
 ### 1. Install the skill
 
+On macOS or Linux:
+
 ```bash
 git clone https://github.com/azadmotala/claude-code-team-builder.git
 
 mkdir -p ~/.claude/skills/claude-code-team-builder
 cp -r claude-code-team-builder/skill/* ~/.claude/skills/claude-code-team-builder/
+```
+
+On Windows, in PowerShell:
+
+```powershell
+git clone https://github.com/azadmotala/claude-code-team-builder.git
+
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\claude-code-team-builder" | Out-Null
+Copy-Item -Recurse -Force claude-code-team-builder\skill\* "$HOME\.claude\skills\claude-code-team-builder\"
 ```
 
 ### 2. Run it

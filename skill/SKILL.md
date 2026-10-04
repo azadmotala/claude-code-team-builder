@@ -270,6 +270,7 @@ Before finishing, verify:
 - ✅ `problem-solver` agent has: Self-Healing Workflow, Handoff Protocol — verbatim
 - ✅ All other agents have: Handoff Protocol — verbatim
 - ✅ Every agent uses subfolder structure (`agents/[name]/AGENT.md`)
+- ✅ The orchestrator's `tools` include `Agent`, so it can hand tasks to other agents when it runs as a subagent
 - ✅ Every agent description references this project's actual tech stack and domain
 - ✅ CLAUDE.md Task Sizing has general rules plus project-specific lines
 - ✅ CLAUDE.md includes agent routing, skill list, domain concepts, completion criteria, and conventions

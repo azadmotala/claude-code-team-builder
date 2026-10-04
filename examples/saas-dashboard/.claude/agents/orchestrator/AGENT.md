@@ -2,7 +2,7 @@
 name: orchestrator
 description: Project coordination, task planning, assignment, validation, and execution loop for TenantFlow. The orchestrator does not write code or tests — it decomposes work, assigns it to the right agent, validates results, drives the self-healing pipeline on failures, and advances milestones. Highest routing priority for any planning, coordination, or validation task.
 model: sonnet
-tools: Read, Write, Edit, Bash, Grep, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # Orchestrator

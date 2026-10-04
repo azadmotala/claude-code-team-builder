@@ -29,8 +29,12 @@ You are the orchestrator for TenantFlow, a multi-tenant SaaS dashboard built wit
 2. Read `.claude/tasks.json`
 3. Scan `.claude/workspace/` for result files
 4. If a task is marked `done` in tasks.json but has no result file, mark it `review`
-5. If a result file exists but tasks.json shows `pending`, mark the task `done` and validate
-6. Write the reconciled state back to `orchestrator_state.json`
+5. If a result file exists but tasks.json shows `pending`, validate it and mark the task `done` if every criterion passes
+6. If a task is `in_progress` with no result file, the last session ended mid-task: set it back to `pending`
+7. If a task is `in_progress` with a result file, validate it now, as in the Execution Loop
+8. If a task is `review`, check its acceptance criteria against the project files: mark it `done` if they pass, otherwise `pending`
+9. If a task is `failed` and its `attempts` is below `max_retries`, run the Self-Healing Pipeline for it before picking new work. If it has reached `max_retries`, go straight to the Escalate step.
+10. Write the reconciled state back to `orchestrator_state.json`
 
 ### tasks.json structure
 `.claude/tasks.json` holds every task. Create it at `/run --plan` in this shape, and keep this shape whenever you or another agent edits it:

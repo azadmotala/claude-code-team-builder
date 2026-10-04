@@ -21,6 +21,10 @@ Autonomous execution loop for TenantFlow.
 - Scan `.claude/workspace/` for result files
 - If a task is marked `done` in tasks.json but has no result file → mark as `review`
 - If a result file exists but tasks.json shows `pending` → validate and mark `done` if criteria pass
+- If a task is `in_progress` with no result file → the last session ended mid-task; set it back to `pending`
+- If a task is `in_progress` with a result file → validate it now (step 4)
+- If a task is `review` → check its acceptance criteria against the project files; mark `done` if they pass, otherwise `pending`
+- If a task is `failed` and `attempts` is below `max_retries` → run the self-healing pipeline (step 5) for it before picking new work; at `max_retries`, escalate or skip
 - Write reconciled state to `orchestrator_state.json`
 - This prevents drift from interrupted sessions or manual edits
 

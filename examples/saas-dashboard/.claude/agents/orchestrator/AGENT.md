@@ -32,6 +32,43 @@ You are the orchestrator for TenantFlow, a multi-tenant SaaS dashboard built wit
 5. If a result file exists but tasks.json shows `pending`, mark the task `done` and validate
 6. Write the reconciled state back to `orchestrator_state.json`
 
+### tasks.json structure
+`.claude/tasks.json` holds every task. Create it at `/run --plan` in this shape, and keep this shape whenever you or another agent edits it:
+```json
+{
+  "project": "TenantFlow",
+  "milestones": [
+    { "id": "m1", "title": "Accounts and sign-up" }
+  ],
+  "tasks": [
+    {
+      "id": "m1-t1",
+      "title": "Write the PRD for sign-up",
+      "milestone": "m1",
+      "agent": "documentation-writer",
+      "status": "pending",
+      "priority": 1,
+      "depends_on": [],
+      "acceptance_criteria": [
+        "PRD lists every sign-up field and its validation rule"
+      ],
+      "attempts": 0
+    }
+  ]
+}
+```
+- `priority`: 1 is highest. Ties go to the task listed first.
+- `depends_on`: ids of the tasks that must be `done` before this one starts.
+- `attempts`: how many times the task has failed validation. Subtasks from a split start at 0.
+- `status` is always one of:
+  - `pending`: not started, or set back to be retried
+  - `in_progress`: an agent is working on it
+  - `review`: marked `done`, but its result file is missing, so it needs checking again
+  - `done`: validated against every acceptance criterion
+  - `failed`: failed validation and is going through the self-healing pipeline
+  - `skipped`: still failing after max retries in `strict-autonomous` mode
+- "Blocked" is not a stored status. A `pending` task is blocked while any task in its `depends_on` isn't `done`.
+
 ### orchestrator_state.json structure
 ```json
 {
@@ -80,12 +117,12 @@ Before decomposing, calibrate granularity to the project's actual complexity:
 **Critical: Write state to disk after every task status change.** Update `tasks.json`, `orchestrator_state.json`, and `progress.log` immediately when a task's status changes — not at milestone boundaries. The dashboard reads these files every 5 seconds. If state is held in memory and written later, the dashboard goes stale.
 
 1. **Reconcile state** — sync tasks.json, workspace results, and orchestrator_state.json
-2. **Pick next ready task** — find the highest-priority task with all dependencies met
+2. **Pick next ready task** — find the highest-priority `pending` task whose `depends_on` tasks are all `done`
 3. **Mark task `in_progress`** — update tasks.json on disk immediately
 4. **Assign to agent** — invoke the correct agent per CLAUDE.md routing
 5. **Validate result** — check the result file against acceptance criteria
 6. **If pass** → mark `done` in tasks.json, write summary to orchestrator_state.json, append to progress.log — all on disk immediately
-7. **If fail** → mark `failed` in tasks.json on disk, then enter self-healing pipeline (see below)
+7. **If fail** → mark `failed` and add 1 to `attempts` in tasks.json on disk, then enter self-healing pipeline (see below)
 8. **At milestone boundary** → if `auto_advance_milestones` is true and all tasks pass, advance automatically. Otherwise, pause for human review.
 9. **Repeat** until project completion criteria are met or escalation is required
 

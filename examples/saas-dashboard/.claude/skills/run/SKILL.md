@@ -30,7 +30,7 @@ Autonomous execution loop for TenantFlow.
 - The dashboard reads `tasks.json` and `progress.log` dynamically via fetch
 
 ### 2. Pick next ready task
-- Find the highest-priority task with status `pending` and all dependencies in status `done`
+- Find the highest-priority task with status `pending` and all `depends_on` tasks in status `done`
 - If no tasks are ready, check for blocked tasks and report why
 
 ### 3. Assign to agent

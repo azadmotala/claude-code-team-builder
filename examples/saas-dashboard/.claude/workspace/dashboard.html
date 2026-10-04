@@ -29,6 +29,8 @@
   .count-pending { color: #eab308; }
   .count-blocked { color: #6b7280; }
   .count-failed { color: #ef4444; }
+  .count-review { color: #a78bfa; }
+  .count-skipped { color: #a8a29e; }
 
   /* Progress */
   .progress-pct { font-size: 48px; font-weight: 800; line-height: 1; margin-bottom: 10px; }
@@ -58,6 +60,7 @@
   .task-badge-blocked { background: #374151; color: #9ca3af; }
   .task-badge-failed { background: #991b1b; color: #fca5a5; }
   .task-badge-review { background: #7c3aed; color: #e9d5ff; }
+  .task-badge-skipped { background: #44403c; color: #d6d3d1; }
   .task-info { flex: 1; }
   .task-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
   .task-meta { font-size: 12px; color: #64748b; }
@@ -127,12 +130,17 @@ function getStatusClass(status) {
   if (s === 'blocked') return 'blocked';
   if (s === 'failed' || s === 'error') return 'failed';
   if (s === 'review') return 'review';
+  if (s === 'skipped') return 'skipped';
   return 'pending';
 }
 
-function getStatusLabel(status) {
-  const map = { done: 'DONE', in_progress: 'IN PROGRESS', pending: 'PENDING', blocked: 'BLOCKED', failed: 'FAILED', review: 'REVIEW' };
-  return map[getStatusClass(status)] || status.toUpperCase();
+const STATUS_LABELS = { done: 'DONE', in_progress: 'IN PROGRESS', pending: 'PENDING', blocked: 'BLOCKED', failed: 'FAILED', review: 'REVIEW', skipped: 'SKIPPED' };
+
+// "Blocked" isn't stored in tasks.json: a pending task is blocked while any of its depends_on isn't done.
+function effectiveStatus(task, statusById) {
+  const s = getStatusClass(task.status);
+  if (s === 'pending' && Array.isArray(task.depends_on) && task.depends_on.some(id => statusById[id] !== 'done')) return 'blocked';
+  return s;
 }
 
 async function loadJSON(path) {
@@ -195,6 +203,12 @@ async function refresh() {
     tasks = data;
   } else if (data.tasks && Array.isArray(data.tasks)) {
     tasks = data.tasks;
+    // The tasks.json structure keeps milestone titles in a separate milestones list
+    if (Array.isArray(data.milestones)) {
+      const titles = {};
+      for (const m of data.milestones) titles[m.id] = m.title || m.name || m.id;
+      for (const t of tasks) if (!t.milestone_title && titles[t.milestone]) t.milestone_title = titles[t.milestone];
+    }
   } else if (data.milestones && Array.isArray(data.milestones)) {
     for (const m of data.milestones) {
       if (m.tasks) {
@@ -208,12 +222,12 @@ async function refresh() {
   }
 
   // Counts
-  const counts = { done: 0, in_progress: 0, pending: 0, blocked: 0, failed: 0 };
-  for (const t of tasks) {
-    const s = getStatusClass(t.status);
-    if (counts[s] !== undefined) counts[s]++;
-    else counts.pending++;
-  }
+  const statusById = {};
+  for (const t of tasks) statusById[t.id] = getStatusClass(t.status);
+  for (const t of tasks) t._status = effectiveStatus(t, statusById);
+
+  const counts = { done: 0, in_progress: 0, review: 0, pending: 0, blocked: 0, failed: 0, skipped: 0 };
+  for (const t of tasks) counts[t._status]++;
   const total = tasks.length;
   const pct = total > 0 ? Math.round((counts.done / total) * 100) : 0;
   const allDone = total > 0 && counts.done === total;
@@ -233,8 +247,10 @@ async function refresh() {
     '<span class="count-item count-done">✓ Done: ' + counts.done + '</span>' +
     '<span class="count-item count-progress">◆ In Progress: ' + counts.in_progress + '</span>' +
     '<span class="count-item count-pending">○ Pending: ' + counts.pending + '</span>' +
+    (counts.review > 0 ? '<span class="count-item count-review">◇ Review: ' + counts.review + '</span>' : '') +
     (counts.blocked > 0 ? '<span class="count-item count-blocked">▪ Blocked: ' + counts.blocked + '</span>' : '') +
-    (counts.failed > 0 ? '<span class="count-item count-failed">✗ Failed: ' + counts.failed + '</span>' : '');
+    (counts.failed > 0 ? '<span class="count-item count-failed">✗ Failed: ' + counts.failed + '</span>' : '') +
+    (counts.skipped > 0 ? '<span class="count-item count-skipped">» Skipped: ' + counts.skipped + '</span>' : '');
 
   // Progress
   document.getElementById('progress-pct').textContent = pct + '%';
@@ -246,7 +262,7 @@ async function refresh() {
   const milestonesEl = document.getElementById('milestones');
   milestonesEl.innerHTML = milestones.map(m => {
     const mTotal = m.tasks.length;
-    const mDone = m.tasks.filter(t => getStatusClass(t.status) === 'done').length;
+    const mDone = m.tasks.filter(t => t._status === 'done').length;
     const mPct = mTotal > 0 ? Math.round((mDone / mTotal) * 100) : 0;
     const fillClass = mPct === 100 ? 'milestone-bar-fill-done' : mPct > 0 ? 'milestone-bar-fill-partial' : 'milestone-bar-fill-zero';
     return '<div class="milestone">' +
@@ -258,9 +274,8 @@ async function refresh() {
   // Tasks
   const tasksEl = document.getElementById('tasks');
   tasksEl.innerHTML = tasks.map(t => {
-    const sc = getStatusClass(t.status);
     return '<div class="task">' +
-      '<span class="task-badge task-badge-' + sc + '">' + getStatusLabel(t.status) + '</span>' +
+      '<span class="task-badge task-badge-' + t._status + '">' + STATUS_LABELS[t._status] + '</span>' +
       '<div class="task-info"><div class="task-name">' + (t.name || t.title || t.id) + '</div>' +
       '<div class="task-meta">' + (t.agent || '') + (t.id ? ' · ' + t.id : '') + '</div></div></div>';
   }).join('');

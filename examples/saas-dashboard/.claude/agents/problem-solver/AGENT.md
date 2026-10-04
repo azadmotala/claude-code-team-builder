@@ -36,6 +36,8 @@ Read the failed task's result file in `.claude/workspace/[task-id].result.md`. I
 - **Split**: Break the task into 2–3 subtasks. Each subtask must be completable in one agent session. Update dependencies in `tasks.json`.
 - **Reassign**: If the task needs a different specialist, recommend a new agent and explain why.
 
+Whatever you change in `tasks.json`, keep the structure and status list defined under State Management in `.claude/agents/orchestrator/AGENT.md`.
+
 ### Step 3: Return control
 Write your diagnosis and fix to `.claude/workspace/[task-id]-repair.md`. The orchestrator reads this and retries.
 

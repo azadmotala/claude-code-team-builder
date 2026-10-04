@@ -19,7 +19,7 @@ Use in Q&A mode — present one section at a time. Skip questions whose answers 
 8. Hosting/deployment: where does this run? (Vercel, Railway, AWS, GCP, Fly.io, self-hosted, unknown)
 9. Key third-party integrations? (Stripe, Twilio, SendGrid, Auth0, Supabase, S3, OpenAI, etc.)
 10. CI/CD setup? (GitHub Actions, GitLab CI, CircleCI, none yet)
-11. Preferred model balance? (cost vs quality — e.g., Sonnet for most agents, Opus only for orchestrator)
+11. Preferred model balance? (cost vs quality — e.g., Sonnet for most agents, Fable or Opus for the orchestrator and problem-solver)
 
 ---
 

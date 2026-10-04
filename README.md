@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://docs.anthropic.com/en/docs/claude-code)
-[![v1.0.0](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/azadmotala/claude-code-team-builder/releases/tag/v1.0.0)
+[![Latest release](https://img.shields.io/github/v/release/azadmotala/claude-code-team-builder?color=green)](https://github.com/azadmotala/claude-code-team-builder/releases/latest)
 
 
 A Claude Code skill that builds a self-healing AI development team for your software project.

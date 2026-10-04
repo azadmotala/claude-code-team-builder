@@ -16,7 +16,7 @@ Tell it what you're building and it writes a full `.claude/` directory: an orche
 Most multi-agent setups need something running outside your editor: cloud APIs, external services, a Python framework. This one is a folder of files.
 
 - **Lives in your repo.** Everything sits in `.claude/` as plain markdown. No services to run, no database, nothing extra to host.
-- **Built for Claude Code.** It's written for Claude Code's own agents and skills from the start, not ported from a general-purpose framework.
+- **Built for Claude Code.** It's built from Claude Code's own agents, skills, and CLAUDE.md.
 - **Fixes its own failures.** A failed task gets classified, then retried, rewritten, split, or handed to another agent. You only hear about it if none of that works.
 - **Nothing advances on vibes.** Every task has explicit acceptance criteria, and the orchestrator checks the result against them before anything moves forward.
 - **Picks up where it left off.** Close a session halfway through and the next one works out where things stood, then carries on.
@@ -31,11 +31,11 @@ Most multi-agent setups need something running outside your editor: cloud APIs, 
 
 **State that survives a crash.** Every session starts by syncing `tasks.json`, the workspace result files, and `orchestrator_state.json`. Interrupted sessions, manual edits, and crashed processes all get straightened out before any new work starts.
 
-**Easy on tokens.** The orchestrator keeps a one-line summary of each finished task rather than the full result, so context grows with the number of tasks, not with how much each one wrote. You can run planning on Opus and validation on Haiku. And it won't split work finer than it needs to: fewer tasks means fewer handoffs, and handoffs are where the tokens go.
+**Easy on tokens.** The orchestrator carries a one-line summary of each finished task and leaves the full results on disk, so context grows with the number of tasks. You can run planning on Opus and validation on Haiku. Its task sizing rules stop it splitting work too finely, so there are fewer agent handoffs to pay for.
 
 **A dashboard you can leave open.** One self-contained HTML file that reads task state from disk and refreshes every 5 seconds. Milestone progress, task status, and an activity timeline, all in your browser.
 
-**Nothing generic.** Agent descriptions name your stack, skills call your real commands, and routing follows your domain. If you're on Prisma and Stripe, the files say Prisma and Stripe, not "database" and "payments".
+**Nothing generic.** Agent descriptions name your stack, skills call your real commands, and routing follows your domain. If you're on Prisma and Stripe, the files say Prisma and Stripe.
 
 ---
 
@@ -218,7 +218,7 @@ Planning needs the strongest reasoning. Checking a result against its criteria d
 It's all plain text in your repo. Once it's generated, change whatever you like:
 
 - Add agents for roles the builder didn't think of
-- Rewrite skill workflows to match the commands you actually use
+- Rewrite skill workflows to match the commands your project uses
 - Keep CLAUDE.md up to date as the project changes
 - Switch autonomy mode or retry policy in `settings.json`
 - Add a domain skill whenever you catch yourself doing the same steps twice
@@ -252,7 +252,7 @@ It's all plain text in your repo. Once it's generated, change whatever you like:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 ## Contributing
 

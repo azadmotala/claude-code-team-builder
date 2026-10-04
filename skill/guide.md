@@ -76,7 +76,7 @@ The builder writes a `.claude/` directory containing:
 - **CLAUDE.md:** your project's brain. Tech stack, domain concepts, agent routing, completion criteria, conventions. Claude reads it at the start of every session.
 - **Agents:** specialists for your project. You always get the four mandatory ones (orchestrator, problem-solver, test engineer, documentation writer), plus developers, reviewers, and domain specialists that fit your stack.
 - **Skills:** slash commands for common workflows. You always get `/run`, `/status`, and `/dashboard`, plus `/deploy`, `/test`, `/review`, and domain skills when your project calls for them.
-- **settings.json:** autonomy mode, retry policy, and the self-healing pipeline.
+- **team.json:** autonomy mode, retry policy, and the self-healing pipeline. Your project's own `.claude/settings.json` is left alone.
 - **Workspace:** where agents write their result files and the orchestrator keeps its state. It starts out with only the dashboard file in it.
 
 ### Step 4: Plan the work
@@ -114,7 +114,7 @@ You can follow along three ways:
 ```
 .claude/
 ├── CLAUDE.md                              ← project context, read every session
-├── settings.json                          ← orchestration + autonomy configuration
+├── team.json                              ← orchestration + autonomy configuration
 ├── agents/
 │   ├── orchestrator/AGENT.md              ← plans, assigns, validates, loops
 │   ├── problem-solver/AGENT.md            ← self-healing, task repair
@@ -177,12 +177,12 @@ Agents don't talk to each other. When an agent finishes a task, it writes a resu
 
 ### Autonomy Modes
 
-There are three, set with `autonomy.mode` in `settings.json`:
+There are three, set with `autonomy.mode` in `team.json`:
 
 | Mode | Behavior |
 |---|---|
 | `supervised` | The default. Stops at each milestone for your review, and comes to you when self-healing can't fix a failure. |
-| `autonomous` | Moves to the next milestone on its own when the acceptance criteria pass. Only stops for a catastrophic failure. |
+| `autonomous` | Moves to the next milestone on its own when the acceptance criteria pass. Only stops when a task still fails after self-healing. |
 | `strict-autonomous` | Never stops to ask. The problem-solver handles everything, and a task that still fails after max retries gets skipped. |
 
 Start with `supervised`. Move to `autonomous` once you trust its plans. Use `strict-autonomous` for batch runs you'll review afterwards.
@@ -231,7 +231,7 @@ Three things keep token use in step with the size of the project:
 
 **State summarization.** The orchestrator carries a one-line summary of each task in `orchestrator_state.json` and leaves the full result files on disk for debugging. It loads only what the current decision needs, so context grows steadily with the number of tasks and long result files stay out of it.
 
-**Tiered model assignment.** Not every agent needs the same model. Set one per tier under `model_tiers` in `settings.json`:
+**Tiered model assignment.** Not every agent needs the same model. Set one per tier under `model_tiers` in `team.json`:
 
 | Tier | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|

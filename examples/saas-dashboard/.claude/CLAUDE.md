@@ -100,4 +100,4 @@ MVP: tenant registration → client management → time tracking → invoice gen
 - GitHub Actions for CI/CD (inferred)
 - Feature branches → main (inferred)
 - No compliance requirements specified
-- Autonomy mode set to supervised. Change in settings.json to autonomous or strict-autonomous.
+- Autonomy mode set to supervised. Change in team.json to autonomous or strict-autonomous.

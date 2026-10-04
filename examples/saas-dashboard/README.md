@@ -12,7 +12,7 @@ A complete example of what `claude-code-team-builder` generates.
 
 ## What Was Generated
 
-7 agents (4 mandatory + 3 project-specific), 8 skills (3 execution + 5 workflow/domain), CLAUDE.md, and settings.json with supervised autonomy mode.
+7 agents (4 mandatory + 3 project-specific), 8 skills (3 execution + 5 workflow/domain), CLAUDE.md, and team.json with supervised autonomy mode.
 
 ### Why These Agents
 

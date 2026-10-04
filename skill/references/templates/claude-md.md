@@ -115,5 +115,5 @@ Built with: [frontend] + [backend] + [database] · Hosted on [hosting] · [Clien
 ## Assumptions
 <!-- Document anything inferred because it wasn't specified. -->
 [e.g., "Assumed Vercel for hosting since not specified. Update if different."]
-[e.g., "Autonomy mode set to supervised. Change in settings.json to autonomous or strict-autonomous."]
+[e.g., "Autonomy mode set to supervised. Change in team.json to autonomous or strict-autonomous."]
 ```

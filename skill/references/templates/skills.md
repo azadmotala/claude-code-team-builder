@@ -28,12 +28,17 @@ Autonomous execution loop for [Project Name].
 ## Execution Loop
 
 ### 0. Reconcile State (always first)
+- Read `.claude/team.json` for the autonomy `mode` and the `retry_policy`
 - Read `.claude/workspace/orchestrator_state.json` if it exists
 - Read `.claude/tasks.json`
 - Scan `.claude/workspace/` for result files
 - If a task is marked `done` in tasks.json but has no result file → mark as `review`
 - If a result file exists but tasks.json shows `pending` → validate and mark `done` if criteria pass
-- Write reconciled state to `orchestrator_state.json`
+- If a task is `in_progress` with no result file → the last session ended mid-task; set it back to `pending`
+- If a task is `in_progress` with a result file → validate it now (step 4)
+- If a task is `review` → check its acceptance criteria against the project files; mark `done` if they pass, otherwise `pending`
+- If a task is `failed` and `attempts` is below `max_retries` → run the self-healing pipeline (step 5) for it before picking new work; at `max_retries`, escalate or skip
+- Write status changes to `tasks.json` and the reconciled state to `orchestrator_state.json`
 - This prevents drift from interrupted sessions or manual edits
 
 ### 1. Generate dashboard
@@ -42,21 +47,22 @@ Autonomous execution loop for [Project Name].
 - The dashboard reads `tasks.json` and `progress.log` dynamically via fetch
 
 ### 2. Pick next ready task
-- Find the highest-priority task with status `pending` and all dependencies in status `done`
+- Find the highest-priority task with status `pending` and all `depends_on` tasks in status `done`
 - If no tasks are ready, check for blocked tasks and report why
 
 ### 3. Assign to agent
 - Use CLAUDE.md agent routing to select the correct agent
+- Mark the task `in_progress` in `tasks.json`
 - Invoke the agent with the task definition and acceptance criteria
 
 ### 4. Validate result
 - Read the agent's result file from `.claude/workspace/[task-id].result.md`
 - Check each acceptance criterion — pass or fail
 - If all pass → mark task `done`, log to `progress.log`
-- If any fail → enter self-healing pipeline
+- If any fail → mark `failed` and add 1 to `attempts` in `tasks.json`, then enter self-healing pipeline
 
 ### 5. Self-healing pipeline (on failure)
-Read retry policy from `settings.json`. Classify the failure first:
+Read retry policy from `.claude/team.json`. Classify the failure first:
 
 **Simple failure** (syntax error, missing import, typo, wrong path):
 - Retry once with the same agent plus a hint describing the error
@@ -70,12 +76,14 @@ Read retry policy from `settings.json`. Classify the failure first:
 1. **Refine** (attempts 1–2): problem-solver rewrites the task
 2. **Split** (attempt 3): problem-solver decomposes into subtasks
 3. **Reassign** (attempt 4): try a different qualified agent
-4. **Escalate or skip**: based on `settings.json` autonomy mode
+4. **Escalate or skip**: in `supervised` or `autonomous` mode, pause and ask the human; in `strict-autonomous` mode, mark the task `skipped` and move on
+
+Once the problem-solver has repaired a task, set it back to `pending` so step 2 picks it up again.
 
 ### 6. Milestone boundary
 - When all tasks in a milestone are `done`:
-  - If `auto_advance_milestones` is true → validate milestone outputs and advance
-  - If false → pause and ask for human review
+  - If `mode` is `supervised` → pause and ask for human review
+  - Otherwise → validate milestone outputs and advance
 
 ### 7. Completion check
 - After each milestone, check project completion criteria from CLAUDE.md
@@ -83,7 +91,8 @@ Read retry policy from `settings.json`. Classify the failure first:
 - If not → continue to next milestone
 
 ## State Files
-- `tasks.json` — task definitions, status, dependencies, assignment
+- `team.json` — autonomy mode, retry policy, and self-healing settings
+- `tasks.json` — every task, in the structure and with the status list defined under State Management in `.claude/agents/orchestrator/AGENT.md`
 - `workspace/orchestrator_state.json` — persistent orchestrator memory
 - `workspace/progress.log` — human-readable task transition log
 - `workspace/dashboard.html` — visual progress tracker (auto-generated at execution start)
@@ -106,19 +115,21 @@ Reports project state for [Project Name].
 ## Workflow
 
 1. **Read state** — load `tasks.json` and `orchestrator_state.json`
-2. **Categorize tasks**:
-   - ✅ Done — completed and validated
-   - 🔄 In progress — currently assigned
-   - 🚫 Blocked — dependencies not met
-   - ⏳ Pending — ready but not started
-   - 🔴 Failed — exceeded retry limit
+2. **Categorize tasks** by `status` (the list is under State Management in `.claude/agents/orchestrator/AGENT.md`):
+   - ✅ Done — `done`
+   - 🔄 In progress — `in_progress`
+   - 🔍 Review — `review`, needs checking again
+   - 🚫 Blocked — `pending`, but a task in its `depends_on` isn't `done`
+   - ⏳ Pending — `pending` and ready to start
+   - 🔴 Failed — `failed`, going through self-healing
+   - ⏭️ Skipped — `skipped` after max retries
 3. **Show milestone progress** — percentage complete per milestone
 4. **Show recent activity** — last 5 entries from `progress.log`
 5. **Show next action** — what the orchestrator will do next
-6. **Show failures** — any tasks that failed with attempt count and reason
+6. **Show failures** — any failed or skipped tasks, with `attempts` and the reason
 
 ## Output format
-Print to console. Group by milestone. Show counts at the top: `Done: X | In Progress: X | Blocked: X | Pending: X | Failed: X`
+Print to console. Group by milestone. Show counts at the top: `Done: X | In Progress: X | Review: X | Blocked: X | Pending: X | Failed: X | Skipped: X`
 ```
 
 ### /dashboard

@@ -91,7 +91,7 @@ It fills in the rest with sensible defaults.
 your-project/
 └── .claude/
     ├── CLAUDE.md                              ← project brain, read every session
-    ├── settings.json                          ← autonomy, retry policy, model tiers
+    ├── team.json                              ← autonomy, retry policy, model tiers
     ├── agents/
     │   ├── orchestrator/AGENT.md              ← plans, assigns, validates, loops
     │   ├── problem-solver/AGENT.md            ← self-healing, task repair
@@ -160,7 +160,7 @@ The skill works through five phases:
 2. **Agent selection**: picks the four mandatory agents, plus specialists that fit your stack and how complex the project is
 3. **Skill selection**: adds execution, workflow, and domain skills
 4. **File generation**: writes every file in `.claude/` for your project. The sections that control behavior (state management, the self-healing pipeline, task sizing rules) are copied word for word from the templates, because the agents need the edge cases a summary would drop.
-5. **Validation**: checks its own output. The mandatory agents are there, the copied sections are complete, every description mentions your real stack, and `settings.json` has the autonomy and self-healing config.
+5. **Validation**: checks its own output. The mandatory agents are there, the copied sections are complete, every description mentions your real stack, and `team.json` has the autonomy and self-healing config.
 
 ### The Execution Loop
 
@@ -193,17 +193,17 @@ Once you've approved the plan, `/run` goes round this loop until the project is 
 
 ### Autonomy Modes
 
-Set `autonomy.mode` in `settings.json`:
+Set `autonomy.mode` in `team.json`:
 
 | Mode | Behavior |
 |---|---|
 | `supervised` | The default. Stops at each milestone so you can review, and comes to you when self-healing can't fix a failure. |
-| `autonomous` | Moves to the next milestone on its own when the criteria pass. Only stops for a catastrophic failure. |
+| `autonomous` | Moves to the next milestone on its own when the criteria pass. Only stops when a task still fails after self-healing. |
 | `strict-autonomous` | Never stops to ask. The problem-solver handles everything, and a task that still fails after max retries gets skipped. |
 
 ### Model Tiers
 
-Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers, and you pick a model for each under `model_tiers` in `settings.json`:
+Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers, and you pick a model for each under `model_tiers` in `team.json`:
 
 | Tier | Agents | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|---|
@@ -220,7 +220,7 @@ It's all plain text in your repo. Once it's generated, change whatever you like:
 - Add agents for roles the builder didn't think of
 - Rewrite skill workflows to match the commands your project uses
 - Keep CLAUDE.md up to date as the project changes
-- Switch autonomy mode or retry policy in `settings.json`
+- Switch autonomy mode or retry policy in `team.json`
 - Add a domain skill whenever you catch yourself doing the same steps twice
 
 ---

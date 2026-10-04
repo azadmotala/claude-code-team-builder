@@ -121,6 +121,8 @@ Not every agent needs the same model. Assign based on the reasoning complexity o
 
 Ask the user during discovery (question 11) for their preference. Default: sonnet for all agents. If they want cost optimization, drop validation agents to haiku. If they want maximum quality, upgrade planning agents to opus.
 
+Write each agent's model into the `model:` line of its frontmatter. That line is the only thing Claude Code reads to choose a subagent's model, so it's where the tier lives; there is no separate tier setting. To change a tier later, edit `model:` in every agent in that tier.
+
 ---
 
 ## Phase 3: Determine Skills
@@ -176,7 +178,7 @@ Structural sections that must be copied verbatim from the templates:
 | orchestrator | Task Sizing Rules, State Management, State Summarization, Execution Loop, Self-Healing Pipeline, Handoff Protocol |
 | problem-solver | Self-Healing Workflow, Handoff Protocol |
 | All other agents | Handoff Protocol |
-| /run skill | Execution Loop (all steps including Reconcile State, Self-healing pipeline) |
+| /run skill | Execution Loop (it points at the orchestrator's loop rather than repeating it) |
 | /dashboard skill | How the dashboard works, Important |
 | CLAUDE.md | Task Sizing (copy general rules, then add project-specific lines below them) |
 
@@ -230,11 +232,6 @@ Write the orchestration settings to `.claude/team.json`:
     "enabled": true,
     "pipeline": ["simple-retry", "refine-instructions", "split-task", "reassign-agent", "escalate"],
     "invoke_problem_solver": "structural-failures-only"
-  },
-  "model_tiers": {
-    "planning": "sonnet",
-    "execution": "sonnet",
-    "validation": "sonnet"
   }
 }
 ```
@@ -246,11 +243,7 @@ The `mode` field is the only switch for milestone pauses and escalation. It acce
 - `"autonomous"` — advances milestones on its own when acceptance criteria pass, and stops to ask only when a task still fails after self-healing
 - `"strict-autonomous"` — never stops to ask; a task that still fails after self-healing is marked `skipped`
 
-The `model_tiers` field controls which model each agent class uses:
-- `"planning"` — orchestrator, problem-solver (options: `"opus"`, `"sonnet"`)
-- `"execution"` — all developer agents, devops (options: `"sonnet"`, `"haiku"`)
-- `"validation"` — test-engineer, code-reviewer, documentation-writer (options: `"sonnet"`, `"haiku"`)
-- Default: `"sonnet"` for all tiers. For cost optimization, set validation to `"haiku"`. For maximum quality, set planning to `"opus"`.
+Models are not set here. Each agent's tier goes in its own `model:` frontmatter (see Phase 2).
 
 ### 4E: workspace directory and dashboard
 
@@ -275,7 +268,8 @@ Before finishing, verify:
 - ✅ Every agent description references this project's actual tech stack and domain
 - ✅ CLAUDE.md Task Sizing has general rules plus project-specific lines
 - ✅ CLAUDE.md includes agent routing, skill list, domain concepts, completion criteria, and conventions
-- ✅ team.json includes autonomy, retry, self-healing, and model tier configuration, and `.claude/settings.json` was not created or changed
+- ✅ team.json includes autonomy, retry, and self-healing configuration, and `.claude/settings.json` was not created or changed
+- ✅ Every agent's `model:` frontmatter matches its tier (planning, execution, validation) for the chosen model balance
 - ✅ `dashboard.html` in workspace is the fixed template copied from `references/templates/dashboard.html`
 - ✅ Execution skills (`/run`, `/status`, `/dashboard`) included
 - ✅ At least 2 workflow/domain skills created

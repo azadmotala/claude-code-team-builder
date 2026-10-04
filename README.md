@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-blueviolet)](https://docs.anthropic.com/en/docs/claude-code)
-[![v1.0.0](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/azadmotala/claude-code-team-builder/releases/tag/v1.0.0)
+[![Latest release](https://img.shields.io/github/v/release/azadmotala/claude-code-team-builder?color=green)](https://github.com/azadmotala/claude-code-team-builder/releases/latest)
 
 
 A Claude Code skill that builds a self-healing AI development team for your software project.
@@ -91,7 +91,7 @@ It fills in the rest with sensible defaults.
 your-project/
 └── .claude/
     ├── CLAUDE.md                              ← project brain, read every session
-    ├── team.json                              ← autonomy, retry policy, model tiers
+    ├── team.json                              ← autonomy, retry policy, self-healing
     ├── agents/
     │   ├── orchestrator/AGENT.md              ← plans, assigns, validates, loops
     │   ├── problem-solver/AGENT.md            ← self-healing, task repair
@@ -203,7 +203,7 @@ Set `autonomy.mode` in `team.json`:
 
 ### Model Tiers
 
-Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers, and you pick a model for each under `model_tiers` in `team.json`:
+Planning needs the strongest reasoning. Checking a result against its criteria doesn't. So agents are grouped into three tiers. The builder asks how you want to balance cost and quality, then writes each agent's model into the `model:` line at the top of its `AGENT.md`. To change a tier later, edit that line in each agent in the tier.
 
 | Tier | Agents | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|---|

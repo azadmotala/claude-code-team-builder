@@ -189,10 +189,9 @@ function getTimelineDotClass(line) {
 }
 
 async function refresh() {
-  // Try multiple possible paths for tasks.json
-  let data = await loadJSON('tasks.json');
-  if (!data) data = await loadJSON('../tasks.json');
-  if (!data) data = await loadJSON('.claude/tasks.json');
+  // tasks.json lives in .claude/, one level up. Older setups kept it next to the dashboard.
+  let data = await loadJSON('../tasks.json');
+  if (!data) data = await loadJSON('tasks.json');
 
   const logText = await loadText('progress.log');
 
@@ -247,7 +246,7 @@ async function refresh() {
   badge.textContent = allDone ? 'COMPLETE' : 'EXECUTING';
   badge.className = 'badge ' + (allDone ? 'badge-complete' : 'badge-executing');
 
-  const now = new Date().toISOString().slice(0, 10);
+  const now = new Date().toLocaleString();
   document.getElementById('subtitle').textContent = 'Last updated: ' + now + '  ·  Auto-refreshes every 5 seconds';
 
   // Counts bar

@@ -35,7 +35,7 @@ You are the orchestrator for TenantFlow, a multi-tenant SaaS dashboard built wit
 8. If a task is `in_progress` with a result file, validate it now, as in the Execution Loop
 9. If a task is `review`, check its acceptance criteria against the project files: mark it `done` if they pass, otherwise `pending`
 10. If a task is `failed` and its `attempts` is below `max_retries`, run the Self-Healing Pipeline for it before picking new work. If it has reached `max_retries`, go straight to the Escalate step.
-11. Write the reconciled state back to `orchestrator_state.json`
+11. Write status changes to `tasks.json` and the reconciled state to `orchestrator_state.json`
 
 ### tasks.json structure
 `.claude/tasks.json` holds every task. Create it at `/run --plan` in this shape, and keep this shape whenever you or another agent edits it:
@@ -148,6 +148,8 @@ When a task fails, classify the failure before choosing a response:
 2. **Split task** (attempt 3): Problem-solver decomposes into 2–3 smaller subtasks
 3. **Reassign agent** (attempt 4): Try a different agent if one is qualified
 4. **Escalate** (after max retries): in `supervised` or `autonomous` mode, pause and ask the human. In `strict-autonomous` mode, mark the task `skipped`, log the failure, and move to the next task.
+
+Once the problem-solver has repaired a task, set it back to `pending` so the Execution Loop picks it up again.
 
 Log every attempt in `orchestrator_state.json` under `failed_attempts`.
 

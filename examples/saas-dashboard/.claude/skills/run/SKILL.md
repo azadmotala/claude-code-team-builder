@@ -26,7 +26,7 @@ Autonomous execution loop for TenantFlow.
 - If a task is `in_progress` with a result file → validate it now (step 4)
 - If a task is `review` → check its acceptance criteria against the project files; mark `done` if they pass, otherwise `pending`
 - If a task is `failed` and `attempts` is below `max_retries` → run the self-healing pipeline (step 5) for it before picking new work; at `max_retries`, escalate or skip
-- Write reconciled state to `orchestrator_state.json`
+- Write status changes to `tasks.json` and the reconciled state to `orchestrator_state.json`
 - This prevents drift from interrupted sessions or manual edits
 
 ### 1. Generate dashboard
@@ -40,13 +40,14 @@ Autonomous execution loop for TenantFlow.
 
 ### 3. Assign to agent
 - Use CLAUDE.md agent routing to select the correct agent
+- Mark the task `in_progress` in `tasks.json`
 - Invoke the agent with the task definition and acceptance criteria
 
 ### 4. Validate result
 - Read the agent's result file from `.claude/workspace/[task-id].result.md`
 - Check each acceptance criterion — pass or fail
 - If all pass → mark task `done`, log to `progress.log`
-- If any fail → enter self-healing pipeline
+- If any fail → mark `failed` and add 1 to `attempts` in `tasks.json`, then enter self-healing pipeline
 
 ### 5. Self-healing pipeline (on failure)
 Read retry policy from `.claude/team.json`. Classify the failure first:
@@ -64,6 +65,8 @@ Read retry policy from `.claude/team.json`. Classify the failure first:
 2. **Split** (attempt 3): problem-solver decomposes into subtasks
 3. **Reassign** (attempt 4): try a different qualified agent
 4. **Escalate or skip**: in `supervised` or `autonomous` mode, pause and ask the human; in `strict-autonomous` mode, mark the task `skipped` and move on
+
+Once the problem-solver has repaired a task, set it back to `pending` so step 2 picks it up again.
 
 ### 6. Milestone boundary
 - When all tasks in a milestone are `done`:

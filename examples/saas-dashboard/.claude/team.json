@@ -11,10 +11,5 @@
     "enabled": true,
     "pipeline": ["simple-retry", "refine-instructions", "split-task", "reassign-agent", "escalate"],
     "invoke_problem_solver": "structural-failures-only"
-  },
-  "model_tiers": {
-    "planning": "sonnet",
-    "execution": "sonnet",
-    "validation": "sonnet"
   }
 }

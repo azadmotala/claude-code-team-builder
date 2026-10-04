@@ -231,7 +231,7 @@ Three things keep token use in step with the size of the project:
 
 **State summarization.** The orchestrator carries a one-line summary of each task in `orchestrator_state.json` and leaves the full result files on disk for debugging. It loads only what the current decision needs, so context grows steadily with the number of tasks and long result files stay out of it.
 
-**Tiered model assignment.** Not every agent needs the same model. Set one per tier under `model_tiers` in `team.json`:
+**Tiered model assignment.** Not every agent needs the same model. The builder asks how you want to balance cost and quality, then writes each agent's model into the `model:` line at the top of its `AGENT.md`:
 
 | Tier | Default | Cost-optimized | Quality-maximized |
 |---|---|---|---|
@@ -239,6 +239,6 @@ Three things keep token use in step with the size of the project:
 | Execution (developer agents, devops) | sonnet | sonnet | sonnet |
 | Validation (test-engineer, code-reviewer, docs) | sonnet | haiku | sonnet |
 
-The cost-optimized profile drops validation to haiku, since checking output against criteria is lighter work than planning or writing code. The quality-maximized profile moves planning up to opus for better task breakdowns and failure diagnosis.
+The cost-optimized profile drops validation to haiku, since checking output against criteria is lighter work than planning or writing code. The quality-maximized profile moves planning up to opus for better task breakdowns and failure diagnosis. To change a tier later, edit `model:` in each agent in that tier.
 
 **Right-sized tasks.** The task sizing rules (see [Tasks](#tasks)) stop the orchestrator splitting work too finely. On a project with 1–3 output files, the orchestrator aims for 3–5 tasks in total, build and validation included. Fewer tasks means fewer agent runs and fewer result files to read back.

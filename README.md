@@ -273,3 +273,9 @@ MIT. See [LICENSE](LICENSE).
 ## Contributing
 
 Issues, feature requests, and pull requests are all welcome.
+
+CI checks that [`examples/saas-dashboard/`](examples/saas-dashboard/) still matches the templates. After you change a template, run this to copy the change into the example, then commit both:
+
+```bash
+python .github/scripts/sync_example.py
+```

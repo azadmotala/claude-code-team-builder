@@ -16,6 +16,7 @@ example's own markdown must not keep any placeholders.
 import difflib
 import re
 import sys
+from collections import namedtuple
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -101,27 +102,33 @@ def template_blocks(path):
     return blocks
 
 
-def section(text, title):
-    """Return the lines under the first heading that starts with title.
+def section_span(lines, title):
+    """Return (heading, end) indexes of the first heading that starts with title.
 
-    The section runs to the next heading at the same or a higher level.
-    Headings inside fenced code don't count.
+    The section runs to the next heading at the same or a higher level, so
+    its lines are lines[heading + 1:end]. Headings inside fenced code don't
+    count. Returns None if there is no such heading.
     """
-    lines = text.split('\n')
-    fence, level, body = None, None, None
-    for line in lines:
+    fence, level, start = None, None, None
+    for i, line in enumerate(lines):
         match = FENCE.match(line)
         if match:
             marker = match.group(1)
             fence = marker if fence is None else (None if marker == fence else fence)
         heading = HEADING.match(line) if fence is None and not match else None
-        if body is not None:
+        if start is not None:
             if heading and len(heading.group(1)) <= level:
-                break
-            body.append(line)
+                return start, i
         elif heading and heading.group(2).lower().startswith(title.lower()):
-            level, body = len(heading.group(1)), []
-    return body
+            level, start = len(heading.group(1)), i
+    return None if start is None else (start, len(lines))
+
+
+def section(text, title):
+    """Return the lines under the first heading that starts with title, or None."""
+    lines = text.split('\n')
+    span = section_span(lines, title)
+    return None if span is None else lines[span[0] + 1:span[1]]
 
 
 def meaningful(lines):
@@ -164,6 +171,47 @@ def compare(label, template_text, example_text, title, prefix=False):
     return [f'{label}: "{title}" differs from the template\n    ' + '\n    '.join(diff)]
 
 
+# One section an example file copies from a template. With prefix, the
+# example copies the section's general rules and adds its own lines below.
+Copy = namedtuple('Copy', 'label template path title prefix')
+
+
+def verbatim_copies(project):
+    """Return (copies, problems) for the sections an example copies verbatim.
+
+    problems lists example files that are missing or have no template.
+    """
+    claude = project / '.claude'
+    name = project.relative_to(ROOT).as_posix()
+    copies, problems = [], []
+
+    agent_templates = template_blocks(TEMPLATES / 'agents.md')
+    for agent_file in sorted((claude / 'agents').glob('*/AGENT.md')):
+        agent = agent_file.parent.name
+        label = f'{name} agent {agent}'
+        if agent not in agent_templates:
+            problems.append(f'{label}: no template with name: {agent} in agents.md')
+            continue
+        for title in AGENT_SECTIONS.get(agent, OTHER_AGENT_SECTIONS):
+            copies.append(Copy(label, agent_templates[agent], agent_file, title, False))
+
+    skill_templates = template_blocks(TEMPLATES / 'skills.md')
+    for skill, titles in SKILL_SECTIONS.items():
+        skill_file = claude / 'skills' / skill / 'SKILL.md'
+        label = f'{name} skill /{skill}'
+        if not skill_file.exists():
+            problems.append(f'{label}: missing (it is always generated)')
+            continue
+        for title in titles:
+            copies.append(Copy(label, skill_templates[skill], skill_file, title, False))
+
+    claude_md_template = next(iter(template_blocks(TEMPLATES / 'claude-md.md').values()))
+    for title in CLAUDE_MD_PREFIX_SECTIONS:
+        copies.append(Copy(f'{name} CLAUDE.md', claude_md_template, claude / 'CLAUDE.md', title, True))
+
+    return copies, problems
+
+
 def check_example(project):
     claude = project / '.claude'
     name = project.relative_to(ROOT).as_posix()
@@ -177,30 +225,10 @@ def check_example(project):
         elif read(example_html) != template_html:
             problems.append(f'{name}: .claude/{copy} is not an exact copy of the template')
 
-    agent_templates = template_blocks(TEMPLATES / 'agents.md')
-    for agent_file in sorted((claude / 'agents').glob('*/AGENT.md')):
-        agent = agent_file.parent.name
-        label = f'{name} agent {agent}'
-        if agent not in agent_templates:
-            problems.append(f'{label}: no template with name: {agent} in agents.md')
-            continue
-        for title in AGENT_SECTIONS.get(agent, OTHER_AGENT_SECTIONS):
-            problems += compare(label, agent_templates[agent], read(agent_file), title)
-
-    skill_templates = template_blocks(TEMPLATES / 'skills.md')
-    for skill, titles in SKILL_SECTIONS.items():
-        skill_file = claude / 'skills' / skill / 'SKILL.md'
-        label = f'{name} skill /{skill}'
-        if not skill_file.exists():
-            problems.append(f'{label}: missing (it is always generated)')
-            continue
-        for title in titles:
-            problems += compare(label, skill_templates[skill], read(skill_file), title)
-
-    claude_md_template = next(iter(template_blocks(TEMPLATES / 'claude-md.md').values()))
-    for title in CLAUDE_MD_PREFIX_SECTIONS:
-        problems += compare(f'{name} CLAUDE.md', claude_md_template,
-                            read(claude / 'CLAUDE.md'), title, prefix=True)
+    copies, missing = verbatim_copies(project)
+    problems += missing
+    for copy in copies:
+        problems += compare(copy.label, copy.template, read(copy.path), copy.title, copy.prefix)
 
     problems += leftover_placeholders(claude)
     return problems
@@ -225,6 +253,8 @@ def main():
     for problem in problems:
         print(problem)
     print(f'Checked {len(projects)} example project(s): {len(problems)} problem(s).')
+    if problems:
+        print('If a template changed, run .github/scripts/sync_example.py to copy it into the examples.')
     return 1 if problems else 0
 
 
